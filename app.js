@@ -42,4 +42,35 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+//TESTING OUT UUID, and States objects to put a json object in the database
+initGameState = (_uuid) => {
+  var o = {} // empty Object
+  var key = 'state';
+  o[key] = []; // empty Array, which you can push() values into
+  var data = {
+      uuid:_uuid,
+      playerCount:0,
+      pot: 0,
+      deck:[],
+      players:[],
+      currentPlayer:'none'
+  };
+  o[key].push(data);
+  return JSON.stringify(o);
+}
+
+let id = uuidv4();
+let json = initGameState(id);
+
+console.log(json);
+
+// using States.create is one way of inputing data into the database.
+// we will use pg-promise for other types of queries
+States.create({
+  uuid: id,
+  state: json
+})
+  .then(() => console.log("new entry has been created in db"));
+//TESTING OUT UUID, and States objects to put a json object in the database
+
 module.exports = app;
