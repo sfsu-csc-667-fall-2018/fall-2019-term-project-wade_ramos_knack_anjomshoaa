@@ -1,8 +1,12 @@
+// default express generator modules
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+// added modules
+const States = require('./sequelize');
+const uuidv4 = require('uuid/v4');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
