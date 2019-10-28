@@ -3,7 +3,6 @@
 /**
  * Module dependencies.
  */
-require('dotenv').config();
 var app = require('../app');
 var debug = require('debug')('fall-2019-term-project-wade-ramos-knack-anjomshoaa:server');
 var http = require('http');

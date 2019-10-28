@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const db = require("../postgres.js");
+const db = require("../db/postgres.js");
 
 const GameState = require("../state.js");
 const uuidv4 = require('uuid/v4');
