@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require('../db/postgres.js');
+const db = require('../db');
 router.get("/", (request, response) => {
  db.any(`INSERT INTO test_table ("testString") VALUES ('Hello at $
 {Date.now()}')`)
