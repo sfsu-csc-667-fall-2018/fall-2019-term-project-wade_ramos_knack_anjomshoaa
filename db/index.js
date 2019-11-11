@@ -12,8 +12,49 @@ for some operations such as Authentication using passport
 
 class Users {
     
-    getUser(id) {
-        
+    static get(uuid) {
+        return new Promise((resolve, reject) => {
+            connection.one('select * from users where uuid = $1', [uuid])
+            .then((data) => {
+                // success;
+                //console.log(data)
+                resolve(data);
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });        
+    }
+
+    static create(username, email, password) {
+        let uuid = uuidv4();
+        let pass_key = uuidv4();
+        let salt = uuidv4();
+        return new Promise((resolve, reject) => {
+            connection.none('INSERT INTO public.users(id, name, email, pass_id) VALUES($1, $2, $3, $4)', [uuid, username, email, pass_key])
+            .then(() => {
+                // success;
+
+                connection.none('INSERT INTO public.passwords(,) VALUES($1, $2)', [uuid, username, email, pass_key])
+                .then(() => {
+                    // success;
+            
+                    resolve(uuid);
+                })
+                .catch(error => {
+                    // error;
+                    console.error(error);
+                    reject(error)
+                });
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
     }
     
 }
