@@ -10,6 +10,8 @@ if(process.env.NODE_ENV === 'development') {
   require('dotenv').config();
 }
 
+// const passport = require('passport');
+
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const gameRouter = require('./routes/game')
@@ -26,6 +28,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// passport setup
+// app.use(express.session({ secret: process.env.SESSION_SECRET }));
+// app.use(passport.initialize());
+// app.use(passport.session());	
+
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
