@@ -2,6 +2,8 @@ const pgp = require('pg-promise')();
 const connection = pgp(process.env.DATABASE_URL);
 const uuidv4 = require('uuid/v4');
 const GameState = require("../state.js");
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 /* 
 The following classes are ORM classes. 
 These classes represent tables in our database.
@@ -30,34 +32,121 @@ class Users {
 
     static create(username, email, password) {
         let uuid = uuidv4();
-        let pass_key = uuidv4();
-        let salt = uuidv4();
         return new Promise((resolve, reject) => {
-            connection.none('INSERT INTO public.users(id, name, email, pass_id) VALUES($1, $2, $3, $4)', [uuid, username, email, pass_key])
-            .then(() => {
-                // success;
-
-                connection.none('INSERT INTO public.passwords(,) VALUES($1, $2)', [uuid, username, email, pass_key])
+            bcrypt.hash(password, saltRounds, function(err, hash) {
+                // Store hash in your password DB.
+            connection.none('INSERT INTO public.users(id, name, email, password) VALUES($1, $2, $3, $4)', [uuid, username, email, hash])
                 .then(() => {
                     // success;
-            
                     resolve(uuid);
                 })
                 .catch(error => {
                     // error;
                     console.error(error);
-                    reject(error)
+                    reject(error);
                 });
-            })
-            .catch(error => {
-                // error;
-                console.error(error);
-                reject(error)
             });
         });
+    } // create() end
+
+    static updateName(uuid, name) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE public.users SET name = $1 WHERE id = $2', [name, uuid])
+                .then(() => {
+                    // success;
+                    resolve(name);
+                })
+                .catch(error => {
+                    // error;
+                    console.error(error);
+                    reject(error);
+                });
+        });   
     }
-    
+
+    static updateEmail(uuid, email) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE public.users SET email = $1 WHERE id = $2', [email, uuid])
+                .then(() => {
+                    // success;
+                    resolve(name);
+                })
+                .catch(error => {
+                    // error;
+                    console.error(error);
+                    reject(error);
+                });
+        });   
+        
+    }
+
+    static updatePassword(uuid, password) {
+        return new Promise((resolve, reject) => {
+            bcrypt.hash(password, saltRounds, function(err, hash) {
+                // Store hash in your password DB.
+            connection.none('UPDATE public.users SET password = $1 WHERE id = $2', [hash, uuid])
+                .then(() => {
+                    // success;
+                    resolve(uuid);
+                })
+                .catch(error => {
+                    // error;
+                    console.error(error);
+                    reject(error);
+                });
+            });
+        });           
+    }
+
+    static updateGameState(uuid, gameStateId) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE public.users SET gamestate_id = $1 WHERE id = $2', [gameStateId, uuid])
+                .then(() => {
+                    // success;
+                    resolve(gameStateId);
+                })
+                .catch(error => {
+                    // error;
+                    console.error(error);
+                    reject(error);
+                });
+        });   
+    }
+
+    static updateWinsLoses(uuid, winLoss) {
+        if(winLoss == true)
+        {
+            return new Promise((resolve, reject) => {
+                connection.none('UPDATE public.users SET wins = wins + 1 WHERE id = $1', [uuid])
+                    .then(() => {
+                        // success;
+                        resolve(uuid);
+                    })
+                    .catch(error => {
+                        // error;
+                        console.error(error);
+                        reject(error);
+                    });
+            });   
+        }
+        else
+        {
+            return new Promise((resolve, reject) => {
+                connection.none('UPDATE public.users SET loses = loses + 1 WHERE id = $1', [uuid])
+                    .then(() => {
+                        // success;
+                        resolve(uuid);
+                    })
+                    .catch(error => {
+                        // error;
+                        console.error(error);
+                        reject(error);
+                    });
+            });   
+        }
+    }
 }
+
 
 class GameStates {
 
