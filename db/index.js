@@ -14,7 +14,7 @@ for some operations such as Authentication using passport
 
 class Users {
     
-    static get(uuid) {
+    static getUserByID(uuid) {
         return new Promise((resolve, reject) => {
             connection.one('select * from users where uuid = $1', [uuid])
             .then((data) => {
@@ -30,9 +30,31 @@ class Users {
         });        
     }
 
+    static getUserByName(username) {
+        return new Promise((resolve, reject) => {
+            connection.one('select * from users where name = $1', [username])
+            .then((data) => {
+                // success;
+                //console.log(data)
+                resolve(data);
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });        
+    }
+
     static create(username, email, password) {
+        
+        console.log('The create function is called');
+        
         let uuid = uuidv4();
         return new Promise((resolve, reject) => {
+
+            console.log('the promise is created');
+
             bcrypt.hash(password, saltRounds, function(err, hash) {
                 // Store hash in your password DB.
             connection.none('INSERT INTO public.users(id, name, email, password) VALUES($1, $2, $3, $4)', [uuid, username, email, hash])
