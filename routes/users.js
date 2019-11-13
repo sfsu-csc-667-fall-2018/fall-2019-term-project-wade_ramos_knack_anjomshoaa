@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require("../db/index.js");
+const passport = require('../auth/passport').passport;
 
 /* GET users listing. */
 router.post('/register', function(req, res, next) {
@@ -22,19 +23,15 @@ router.post('/register', function(req, res, next) {
 });
 
 
-router.post('/login', function(req, res, next) {
+router.post('/login',  passport.authenticate('local', { session: false }), function(req, res, next) {
   
   // console.log('Username: ', req.body.username);
   // console.log('password: ', req.body.password);
 
-  db.Users.getUserByName(req.body.username)
-  .then(user => {
-    console.log(user);
-  })
-  .catch(error => {
-    console.log(error);
-  });
-    
+  console.log('User Authenicated');
+
+  console.log(req.user);
+
   res.status(200).send('OK');
 
 });
