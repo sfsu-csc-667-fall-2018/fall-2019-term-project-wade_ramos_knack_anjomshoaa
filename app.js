@@ -14,6 +14,8 @@ if(process.env.NODE_ENV === 'development') {
   require('dotenv').config();
 }
 
+global.__basedir = __dirname;
+
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const gameRouter = require('./routes/game')
@@ -30,6 +32,8 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+//react 
 app.use(express.static("./build"))
 
 // passport setup
