@@ -12,7 +12,7 @@ router.get('/newGameState', function(req, res, next) {
         res.status(200).json(gameState.json);
     })
     .catch(error => {
-        res.status(500).send('error: could not create game state');
+        res.status(500).send(error);
     });
 });
 

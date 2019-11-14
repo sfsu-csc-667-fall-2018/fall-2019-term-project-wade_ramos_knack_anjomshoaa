@@ -5,20 +5,19 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+const passport = require('passport');
+const session = require('express-session')
+const pgSession = require('connect-pg-simple')(session);
+
 // dotenv setup when in development mode
 if(process.env.NODE_ENV === 'development') {
   require('dotenv').config();
 }
 
-
-// const passport = require('passport');
-
-
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const gameRouter = require('./routes/game')
 const testRouter = require('./routes/test')
-
 
 const app = express();
 
@@ -35,8 +34,17 @@ app.use(express.static("./build"))
 
 // passport setup
 // app.use(express.session({ secret: process.env.SESSION_SECRET }));
-// app.use(passport.initialize());
-// app.use(passport.session());	
+
+app.use(session({
+  store: new pgSession({ 
+    pgPromise: require('./db/postgres').connection
+    }),
+  secret: 'TEMPORARY',
+  resave: false,
+  saveUninitialized: false
+}))
+app.use(passport.initialize());
+app.use(passport.session());	
 
 
 app.use('/', indexRouter);
