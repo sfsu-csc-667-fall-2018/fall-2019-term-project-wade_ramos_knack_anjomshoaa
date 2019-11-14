@@ -6,6 +6,14 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.get('/register', function(request, response, next) {
+  response.status(200).sendFile(__basedir + '/build/index.html');
+});
+
+router.get('/gametable', function(request, response, next) {
+  response.status(200).sendFile(__basedir + '/build/index.html');
+});
+
 router.get('/img', function(request, response, next) {
   response.render('index', {title: 'Images'});
 });
