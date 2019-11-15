@@ -1,13 +1,24 @@
 const express = require('express');
 const router = express.Router();
 
-const db = require("../db/index.js");
+const GameStates = require("../db/index.js").GameStates;
 
 /* create a new gamestate object, 
 save it into the gamestates table in postgres, 
 send the json to the client */
-router.get('/newGameState', function(req, res, next) {
-    db.GameStates.create()
+
+router.get('/allGames', (req, res, next) => {
+    GameStates.getActive()
+    .then(games => {
+        res.status(200).json(games);
+    })
+    .catch(error => {
+        res.status(500).send(error);
+    });
+});
+
+router.get('/createGame', (req, res, next) => {
+    GameStates.create()
     .then(gameState => {
         res.status(200).json(gameState.json);
     })
@@ -17,7 +28,7 @@ router.get('/newGameState', function(req, res, next) {
 });
 
 // retreive a gamestate with a json object containing uuid:"xxxx-xxx..."
-router.get('/getGameState', function(req, res, next) {
+router.get('/getGameState', (req, res, next) => {
     let uuid = req.body.uuid;
     db.GameStates.get(uuid)
     .then((data) => {
@@ -34,7 +45,7 @@ router.get('/getGameState', function(req, res, next) {
 });
 
 //the body of the request should be a json gamestate object
-router.post('/updateGameState', function(req, res, next) {
+router.post('/updateGameState', (req, res, next) => {
     let gamestate = req.body;
 
     db.GameStates.update(gamestate.state[0].uuid, gamestate)
