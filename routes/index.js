@@ -14,6 +14,10 @@ router.get('/gametable', function(request, response, next) {
   response.status(200).sendFile(__basedir + '/build/index.html');
 });
 
+router.get('/gameslobby', function(request, response, next) {
+  response.status(200).sendFile(__basedir + '/build/index.html');
+});
+
 router.get('/img', function(request, response, next) {
   response.render('index', {title: 'Images'});
 });
