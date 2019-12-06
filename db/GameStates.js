@@ -1,4 +1,4 @@
-const db = require('./postgres');
+const db = require('./postgres.js');
 const connection = db.connection;
 const uuidv4 = db.uuidv4;
 const GameState = require('../game/state.js');
@@ -7,7 +7,7 @@ class GameStates {
 
     static get(uuid) {  
         return new Promise((resolve, reject) => {
-            connection.one('select * from gamestates where uuid = $1', [uuid])
+            connection.one('select * from gamestates where id = $1', [uuid])
             .then((data) => {
                 // success;
                 //console.log(data)
@@ -57,13 +57,31 @@ class GameStates {
         });
     }
 
+
+
     static update(uuid, gamestate) {
         return new Promise((resolve, reject) => {
-            connection.none('UPDATE gamestates SET state = $1, updated_at = NOW() WHERE uuid = $2;', [gamestate, uuid])
+            connection.none('UPDATE gamestates SET state = $1, updated_at = NOW() WHERE id = $2;', [gamestate, uuid])
             .then(() => {
                 // success;
                 console.log('updated game state in db');
                resolve();
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
+    }
+
+    static updateCurrentPlayer(uuid, currPLayer) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE gamestates SET current_player = $1, updated_at = NOW() WHERE id = $2;', [currPLayer, uuid])
+            .then(() => {
+                // success;
+                console.log('updated game state in db');
+               resolve('updated game state in db');
             })
             .catch(error => {
                 // error;
