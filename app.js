@@ -6,8 +6,8 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const passport = require('passport');
-const session = require('express-session')
-const pgSession = require('connect-pg-simple')(session);
+// const session = require('express-session')
+// const pgSession = require('connect-pg-simple')(session);
 
 // dotenv setup when in development mode
 if(process.env.NODE_ENV === 'development') {
@@ -39,21 +39,21 @@ app.use(express.static("./build"))
 // passport setup
 // app.use(express.session({ secret: process.env.SESSION_SECRET }));
 
-app.use(session({
-  store: new pgSession({ 
-    pgPromise: require('./db/postgres').connection
-    }),
-  secret: 'TEMPORARY',
-  resave: false,
-  saveUninitialized: false
-}))
-app.use(passport.initialize());
-app.use(passport.session());	
+// app.use(session({
+//   store: new pgSession({ 
+//     pgPromise: require('./db/postgres').connection
+//     }),
+//   secret: 'TEMPORARY',
+//   resave: false,
+//   saveUninitialized: false
+// }))
+// app.use(passport.initialize());
+// app.use(passport.session());	
 
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/game', gameRouter);
+app.use('/gameslobby', gameRouter);
 app.use('/test', testRouter);
 
 // catch 404 and forward to error handler

@@ -28,9 +28,44 @@ router.get('/createGame', (req, res, next) => {
 });
 
 // retreive a gamestate with a json object containing uuid:"xxxx-xxx..."
-router.get('/getGameState', (req, res, next) => {
-    let uuid = req.body.uuid;
-    db.GameStates.get(uuid)
+// router.get('/getGameState', (req, res, next) => {
+//     let uuid = req.body.uuid;
+//     db.GameStates.get(uuid)
+//     .then((data) => {
+//         // success;
+//         //console.log(data)
+//         res.status(200).send(data);
+//     })
+//     .catch(error => {
+//         // error;
+//         console.error(error);
+//         res.status(500).send('error: could not get game state');
+//     });
+    
+// });
+
+//the body of the request should be a json gamestate object
+// router.post('/updateGameState', (req, res, next) => {
+//     let gamestate = req.body;
+
+//     db.GameStates.update(gamestate.state[0].uuid, gamestate)
+//     .then(() => {
+//         // success;
+//         console.log('updated game state in db');
+//         res.status(200).send('OK');
+//     })
+//     .catch(error => {
+//         // error;
+//         console.error(error);
+//         res.status(500).send('error: could not update game state');
+//     });
+// });
+
+
+//this endpoint gets the specified gamestates id
+router.post('/:id', (req, res, next) => {
+    let uuid = req.params.id;
+    GameStates.get(uuid)
     .then((data) => {
         // success;
         //console.log(data)
@@ -41,11 +76,96 @@ router.get('/getGameState', (req, res, next) => {
         console.error(error);
         res.status(500).send('error: could not get game state');
     });
-    
 });
 
-//the body of the request should be a json gamestate object
-router.post('/updateGameState', (req, res, next) => {
+router.post('/:id/check', (req, res, next) => {
+
+    let uuid = req.params.id;
+    GameStates.get(uuid)
+    .then((data) => {
+        // success;
+        console.log(data)
+
+        GameStates.updateCurrentPlayer(uuid,data.current_player + 1)
+        .then((msg) => {
+            res.status(200).send(msg);
+        })
+        .catch(error => {
+            console.log(error)
+        });        
+        
+        // grab the update the 
+    })
+    .catch(error => {
+        // error;
+        console.error(error);
+        res.status(500).send('error: could not get game state');
+    });
+
+    //  let uuid = req.params.id;
+    // GameStates.get(uuid)
+    // db.GameStates.update(gamestate.state[0].uuid, gamestate)
+    // .then(() => {
+    //     // success;
+    //     console.log('updated game state in db');
+    //     res.status(200).send('OK');
+    // })
+    // .catch(error => {
+    //     // error;
+    //     console.error(error);
+    //     res.status(500).send('error: could not update game state');
+    // });
+});
+
+router.post('/:id/bet', (req, res, next) => {
+    let gamestate = req.body;
+
+    db.GameStates.update(gamestate.state[0].uuid, gamestate)
+    .then(() => {
+        // success;
+        console.log('updated game state in db');
+        res.status(200).send('OK');
+    })
+    .catch(error => {
+        // error;
+        console.error(error);
+        res.status(500).send('error: could not update game state');
+    });
+});
+
+router.post('/:id/raise', (req, res, next) => {
+    let gamestate = req.body;
+
+    db.GameStates.update(gamestate.state[0].uuid, gamestate)
+    .then(() => {
+        // success;
+        console.log('updated game state in db');
+        res.status(200).send('OK');
+    })
+    .catch(error => {
+        // error;
+        console.error(error);
+        res.status(500).send('error: could not update game state');
+    });
+});
+
+router.post('/:id/call', (req, res, next) => {
+    let gamestate = req.body;
+
+    db.GameStates.update(gamestate.state[0].uuid, gamestate)
+    .then(() => {
+        // success;
+        console.log('updated game state in db');
+        res.status(200).send('OK');
+    })
+    .catch(error => {
+        // error;
+        console.error(error);
+        res.status(500).send('error: could not update game state');
+    });
+});
+
+router.post('/:id/fold', (req, res, next) => {
     let gamestate = req.body;
 
     db.GameStates.update(gamestate.state[0].uuid, gamestate)
