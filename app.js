@@ -10,6 +10,8 @@ const passport = require('passport');
 // const pgSession = require('connect-pg-simple')(session);
 
 // dotenv setup when in development mode
+
+
 if(process.env.NODE_ENV === 'development') {
   require('dotenv').config();
 }
@@ -22,6 +24,8 @@ const gameRouter = require('./routes/game')
 const testRouter = require('./routes/test')
 
 const app = express();
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

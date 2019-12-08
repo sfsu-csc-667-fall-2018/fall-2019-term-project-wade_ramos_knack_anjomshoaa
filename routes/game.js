@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
-
 const GameStates = require("../db/index.js").GameStates;
 
+const io = require('./socket/socketServer')
 /* create a new gamestate object, 
 save it into the gamestates table in postgres, 
 send the json to the client */
+
+
 
 router.get('/:id', function(request, response, next) {
     response.status(200).sendFile(__basedir + '/build/index.html');
