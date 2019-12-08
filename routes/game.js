@@ -123,6 +123,7 @@ router.post('/:id/check', (req, res, next) => {
 });
 
 router.post('/:id/bet', (req, res, next) => {
+// process
     // query the db and get the current gamestate
     // update the players array:
         // update the current players current bet
@@ -130,18 +131,48 @@ router.post('/:id/bet', (req, res, next) => {
     // update the current pot amount
     // update the current player index
     let gamestate = req.body;
+    let uuid = req.params.id;
+    // let bet = req.params.bet;
+    let bet = 1;
 
-    db.GameStates.update(gamestate.state[0].uuid, gamestate)
-    .then(() => {
+    // query the db and get the current gamestate
+    GameStates.get(uuid)
+    .then((data) => {
         // success;
-        console.log('updated game state in db');
-        res.status(200).send('OK');
+        console.log(data.players)
+
+        // let currPlayerUpdate = GameStates.updateCurrentPlayer(uuid,data.current_player + 1)
+        //     .then((msg) => {
+        //         res.status(200).send(msg);
+        //     })
+        //     .catch(error => {
+        //         console.log(error)
+        //     });   
+
+        // update the players array:
+        
+
+        // let updatePlayers = GameStates.updatePlayers(uuid, players)           
     })
     .catch(error => {
         // error;
         console.error(error);
-        res.status(500).send('error: could not update game state');
+        res.status(500).send('error: could not get game state');
     });
+
+
+
+    // db.GameStates.update(gamestate.state[0].uuid, gamestate)
+    // .then(() => {
+    //     // success;
+    //     console.log('updated game state in db');
+    //     res.status(200).send('OK');
+    // })
+    // .catch(error => {
+    //     // error;
+    //     console.error(error);
+    //     res.status(500).send('error: could not update game state');
+    // });
 });
 
 router.post('/:id/raise', (req, res, next) => {
@@ -167,22 +198,57 @@ router.post('/:id/raise', (req, res, next) => {
 });
 
 router.post('/:id/call', (req, res, next) => {
+    // query the db and get the current gamestate
+    // update the players array:
+        // update the current players current bet
+        // update the current players chip count
+    // update the current pot amount
+    // update the current player index
     let gamestate = req.body;
 
-    db.GameStates.update(gamestate.state[0].uuid, gamestate)
-    .then(() => {
-        // success;
-        console.log('updated game state in db');
-        res.status(200).send('OK');
-    })
-    .catch(error => {
-        // error;
-        console.error(error);
-        res.status(500).send('error: could not update game state');
-    });
+        // query the db and get the current gamestate
+        GameStates.get(uuid)
+        .then((data) => {
+            // success;
+            console.log(data.players)
+    
+            // let currPlayerUpdate = GameStates.updateCurrentPlayer(uuid,data.current_player + 1)
+            //     .then((msg) => {
+            //         res.status(200).send(msg);
+            //     })
+            //     .catch(error => {
+            //         console.log(error)
+            //     });   
+    
+            // update the players array:
+            
+    
+            // let updatePlayers = GameStates.updatePlayers(uuid, players)           
+        })
+        .catch(error => {
+            // error;
+            console.error(error);
+            res.status(500).send('error: could not get game state');
+        });
+
+    // db.GameStates.update(gamestate.state[0].uuid, gamestate)
+    // .then(() => {
+    //     // success;
+    //     console.log('updated game state in db');
+    //     res.status(200).send('OK');
+    // })
+    // .catch(error => {
+    //     // error;
+    //     console.error(error);
+    //     res.status(500).send('error: could not update game state');
+    // });
 });
 
 router.post('/:id/fold', (req, res, next) => {
+    // query the db and get the current gamestate
+    // update the players array:
+        // update the current player isInHand to false
+    // update the current player index
     let gamestate = req.body;
 
     db.GameStates.update(gamestate.state[0].uuid, gamestate)
