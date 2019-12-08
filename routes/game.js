@@ -7,6 +7,10 @@ const GameStates = require("../db/index.js").GameStates;
 save it into the gamestates table in postgres, 
 send the json to the client */
 
+router.get('/:id', function(request, response, next) {
+    response.status(200).sendFile(__basedir + '/build/index.html');
+  });
+
 router.get('/allGames', (req, res, next) => {
     GameStates.getActive()
     .then(games => {
@@ -63,9 +67,10 @@ router.get('/createGame', (req, res, next) => {
 
 
 //this endpoint gets the specified gamestates id
-router.post('/:id', (req, res, next) => {
-    let uuid = req.params.id;
-    GameStates.get(uuid)
+router.get('/:id/getGame', (req, res, next) => {
+    let id = req.params.id;
+    console.log('/:id/getGame is ', id)
+    GameStates.get(id)
     .then((data) => {
         // success;
         //console.log(data)
@@ -118,6 +123,12 @@ router.post('/:id/check', (req, res, next) => {
 });
 
 router.post('/:id/bet', (req, res, next) => {
+    // query the db and get the current gamestate
+    // update the players array:
+        // update the current players current bet
+        // update the current players chip count
+    // update the current pot amount
+    // update the current player index
     let gamestate = req.body;
 
     db.GameStates.update(gamestate.state[0].uuid, gamestate)
@@ -134,6 +145,12 @@ router.post('/:id/bet', (req, res, next) => {
 });
 
 router.post('/:id/raise', (req, res, next) => {
+    // query the db and get the current gamestate
+    // update the players array:
+        // update the current players current bet
+        // update the current players chip count
+    // update the current pot amount
+    // update the current player index
     let gamestate = req.body;
 
     db.GameStates.update(gamestate.state[0].uuid, gamestate)
