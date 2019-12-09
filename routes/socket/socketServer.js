@@ -1,11 +1,11 @@
-// const app = require('../../app');
-// const server = require('http').Server(app);
-var io = require('socket.io')(3002);
+const socket = require('socket.io');
+const io = socket();  
 
   let users = [{
       socketId: '',
       user: ''
   }]
+
 
  io.on('connection', socket => {
       console.log("Connected")

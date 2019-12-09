@@ -8,8 +8,11 @@ const logger = require('morgan');
 const passport = require('passport');
 // const session = require('express-session')
 // const pgSession = require('connect-pg-simple')(session);
+const cors = require('cors');
 
 // dotenv setup when in development mode
+
+
 
 
 if(process.env.NODE_ENV === 'development') {
@@ -24,6 +27,9 @@ const gameRouter = require('./routes/game')
 const testRouter = require('./routes/test')
 
 const app = express();
+app.io = require('./routes/socket/socketServer')
+
+
 
 
 // view engine setup
@@ -31,11 +37,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
+app.use(cors())
 //react 
 app.use(express.static("./build"))
 
