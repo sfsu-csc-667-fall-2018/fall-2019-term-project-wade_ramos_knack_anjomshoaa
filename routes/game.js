@@ -3,10 +3,66 @@ const router = express.Router();
 
 const GameStates = require("../db/index.js").GameStates;
 
+const bet = 1;
 /* create a new gamestate object, 
 save it into the gamestates table in postgres, 
 send the json to the client */
 
+const updateCurPlayer = (players, current_player) => {
+    if(current_player === 8)  
+    {
+        current_player = 0;
+    }
+    else
+    {
+        current_player += 1;
+    }
+
+    while(true)
+    {
+        if(players[current_player].isInHand === true)
+        {
+            return current_player
+        }
+        else
+        {
+            if(current_player === 8)  
+            {
+                current_player = 0;
+            }
+            else
+            {
+                current_player += 1;
+            }
+        }
+    }
+}
+
+const emitUpdatedGameState = (uuid) =>{
+    // websocket logic will go here
+    // this function will be called after every 
+    // endpoint finished updating the db.
+
+        GameStates.get(uuid)
+        .then((data) => {
+            // success;
+            console.log('Emiting updated gamestate') 
+    
+            /**
+             * AMIR: Use socket.io to send the updated gamestate
+             * data = gamestate
+             * uuid = the room I am sending this to
+             */
+
+        })
+        .catch(error => {
+            // error;
+            console.error(error);
+            res.status(500).send('error: could not get game state');
+        });
+}
+
+// react redirect to the build
 router.get('/:id', function(request, response, next) {
     response.status(200).sendFile(__basedir + '/build/index.html');
   });
@@ -31,41 +87,6 @@ router.get('/createGame', (req, res, next) => {
     });
 });
 
-// retreive a gamestate with a json object containing uuid:"xxxx-xxx..."
-// router.get('/getGameState', (req, res, next) => {
-//     let uuid = req.body.uuid;
-//     db.GameStates.get(uuid)
-//     .then((data) => {
-//         // success;
-//         //console.log(data)
-//         res.status(200).send(data);
-//     })
-//     .catch(error => {
-//         // error;
-//         console.error(error);
-//         res.status(500).send('error: could not get game state');
-//     });
-    
-// });
-
-//the body of the request should be a json gamestate object
-// router.post('/updateGameState', (req, res, next) => {
-//     let gamestate = req.body;
-
-//     db.GameStates.update(gamestate.state[0].uuid, gamestate)
-//     .then(() => {
-//         // success;
-//         console.log('updated game state in db');
-//         res.status(200).send('OK');
-//     })
-//     .catch(error => {
-//         // error;
-//         console.error(error);
-//         res.status(500).send('error: could not update game state');
-//     });
-// });
-
-
 //this endpoint gets the specified gamestates id
 router.get('/:id/getGame', (req, res, next) => {
     let id = req.params.id;
@@ -84,95 +105,81 @@ router.get('/:id/getGame', (req, res, next) => {
 });
 
 router.post('/:id/check', (req, res, next) => {
-
-    let uuid = req.params.id;
-    GameStates.get(uuid)
-    .then((data) => {
-        // success;
-        console.log(data)
-
-        GameStates.updateCurrentPlayer(uuid,data.current_player + 1)
-        .then((msg) => {
-            res.status(200).send(msg);
+// query the db and get the current gamestate
+    // update the current player index
+    let uuid = req.params.id
+        // query the db and get the current gamestate
+        GameStates.get(uuid)
+        .then((data) => {
+            // success;
+            console.log(data.players[data.current_player]) 
+    
+            // update the gamestate 
+            data.current_player = updateCurPlayer(data.players,data.current_player)
+            // end update to gamestate
+            
+            // update current player in db
+            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player)  
+ 
+            Promise.all([updateCurrentPlayer]).then(values => { 
+                console.log(values);
+                res.status(200).send(values);
+                emitUpdatedGameState(uuid);
+            })
+            .catch(errors => {
+                console.log(error)
+            });     
         })
         .catch(error => {
-            console.log(error)
-        });        
-        
-        // grab the update the 
-    })
-    .catch(error => {
-        // error;
-        console.error(error);
-        res.status(500).send('error: could not get game state');
-    });
-
-    //  let uuid = req.params.id;
-    // GameStates.get(uuid)
-    // db.GameStates.update(gamestate.state[0].uuid, gamestate)
-    // .then(() => {
-    //     // success;
-    //     console.log('updated game state in db');
-    //     res.status(200).send('OK');
-    // })
-    // .catch(error => {
-    //     // error;
-    //     console.error(error);
-    //     res.status(500).send('error: could not update game state');
-    // });
+            // error;
+            console.error(error);
+            res.status(500).send('error: could not get game state');
+        });
 });
 
 router.post('/:id/bet', (req, res, next) => {
-// process
-    // query the db and get the current gamestate
+// query the db and get the current gamestate
     // update the players array:
         // update the current players current bet
         // update the current players chip count
     // update the current pot amount
     // update the current player index
-    let gamestate = req.body;
-    let uuid = req.params.id;
-    // let bet = req.params.bet;
-    let bet = 1;
-
-    // query the db and get the current gamestate
-    GameStates.get(uuid)
-    .then((data) => {
-        // success;
-        console.log(data.players)
-
-        // let currPlayerUpdate = GameStates.updateCurrentPlayer(uuid,data.current_player + 1)
-        //     .then((msg) => {
-        //         res.status(200).send(msg);
-        //     })
-        //     .catch(error => {
-        //         console.log(error)
-        //     });   
-
-        // update the players array:
-        
-
-        // let updatePlayers = GameStates.updatePlayers(uuid, players)           
-    })
-    .catch(error => {
-        // error;
-        console.error(error);
-        res.status(500).send('error: could not get game state');
-    });
-
-
-
-    // db.GameStates.update(gamestate.state[0].uuid, gamestate)
-    // .then(() => {
-    //     // success;
-    //     console.log('updated game state in db');
-    //     res.status(200).send('OK');
-    // })
-    // .catch(error => {
-    //     // error;
-    //     console.error(error);
-    //     res.status(500).send('error: could not update game state');
-    // });
+    // let gamestate = req.body;
+    let uuid = req.params.id
+        // query the db and get the current gamestate
+        GameStates.get(uuid)
+        .then((data) => {
+            // success;
+            console.log(data.players[data.current_player]) 
+    
+            // update the gamestate
+            data.players[data.current_player].currentBet += bet;
+            data.players[data.current_player].chipCount -= bet;
+            data.pot_amount += bet; 
+            data.current_player = updateCurPlayer(data.players,data.current_player)
+            // end update to gamestate
+            
+            // update the players array in db
+            const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+            // update current player in db
+            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player)  
+            // update pot amount in db
+            const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount)
+ 
+            Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount]).then(values => { 
+                console.log(values);
+                res.status(200).send(values);
+                emitUpdatedGameState(uuid);
+            })
+            .catch(errors => {
+                console.log(error)
+            });   
+        })
+        .catch(error => {
+            // error;
+            console.error(error);
+            res.status(500).send('error: could not get game state');
+        });
 });
 
 router.post('/:id/raise', (req, res, next) => {
@@ -182,19 +189,44 @@ router.post('/:id/raise', (req, res, next) => {
         // update the current players chip count
     // update the current pot amount
     // update the current player index
-    let gamestate = req.body;
+    // let gamestate = req.body;
+    let uuid = req.params.id
+        // query the db and get the current gamestate
+        GameStates.get(uuid)
+        .then((data) => {
+            // success;
+            console.log(data.players[data.current_player]) 
+    
+            // update the gamestate
+            data.players[data.current_player].currentBet += (bet*2);
+            data.players[data.current_player].chipCount -= (bet*2);
+            data.pot_amount += (bet*2); 
+            data.current_player = updateCurPlayer(data.players,data.current_player)
+            // end update to gamestate
+            
+            // update the players array in db
+            const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+            // update current player in db
+            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player)  
+            // update pot amount in db
+            const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount)
+ 
+            Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount]).then(values => { 
+                console.log(values);
+                res.status(200).send(values);
+                emitUpdatedGameState(uuid);
+            })
+            .catch(errors => {
+                console.log(error)
+            });  
 
-    db.GameStates.update(gamestate.state[0].uuid, gamestate)
-    .then(() => {
-        // success;
-        console.log('updated game state in db');
-        res.status(200).send('OK');
-    })
-    .catch(error => {
-        // error;
-        console.error(error);
-        res.status(500).send('error: could not update game state');
-    });
+            //GameSa request for the updated gamestate and emit
+        })
+        .catch(error => {
+            // error;
+            console.error(error);
+            res.status(500).send('error: could not get game state');
+        });
 });
 
 router.post('/:id/call', (req, res, next) => {
@@ -204,64 +236,83 @@ router.post('/:id/call', (req, res, next) => {
         // update the current players chip count
     // update the current pot amount
     // update the current player index
-    let gamestate = req.body;
-
+    // let gamestate = req.body;
+    let uuid = req.params.id
         // query the db and get the current gamestate
         GameStates.get(uuid)
         .then((data) => {
             // success;
-            console.log(data.players)
+            console.log(data.players[data.current_player]) 
     
-            // let currPlayerUpdate = GameStates.updateCurrentPlayer(uuid,data.current_player + 1)
-            //     .then((msg) => {
-            //         res.status(200).send(msg);
-            //     })
-            //     .catch(error => {
-            //         console.log(error)
-            //     });   
-    
-            // update the players array:
+            // update the gamestate
+            data.players[data.current_player].currentBet += bet;
+            data.players[data.current_player].chipCount -= bet;
+            data.pot_amount += bet; 
+            data.current_player = updateCurPlayer(data.players,data.current_player)
+            // end update to gamestate
             
-    
-            // let updatePlayers = GameStates.updatePlayers(uuid, players)           
+            // update the players array in db
+            const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+            // update current player in db
+            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player)  
+            // update pot amount in db
+            const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount)
+ 
+            Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount]).then(values => { 
+                console.log(values);
+                res.status(200).send(values);
+                emitUpdatedGameState(uuid);
+            })
+            .catch(errors => {
+                console.log(error)
+            });  
+
+            //GameSa request for the updated gamestate and emit
         })
         .catch(error => {
             // error;
             console.error(error);
             res.status(500).send('error: could not get game state');
         });
-
-    // db.GameStates.update(gamestate.state[0].uuid, gamestate)
-    // .then(() => {
-    //     // success;
-    //     console.log('updated game state in db');
-    //     res.status(200).send('OK');
-    // })
-    // .catch(error => {
-    //     // error;
-    //     console.error(error);
-    //     res.status(500).send('error: could not update game state');
-    // });
 });
 
 router.post('/:id/fold', (req, res, next) => {
     // query the db and get the current gamestate
     // update the players array:
-        // update the current player isInHand to false
-    // update the current player index
-    let gamestate = req.body;
-
-    db.GameStates.update(gamestate.state[0].uuid, gamestate)
-    .then(() => {
-        // success;
-        console.log('updated game state in db');
-        res.status(200).send('OK');
-    })
-    .catch(error => {
-        // error;
-        console.error(error);
-        res.status(500).send('error: could not update game state');
-    });
+        // update the current players isInHand false
+    
+    let uuid = req.params.id
+        // query the db and get the current gamestate
+        GameStates.get(uuid)
+        .then((data) => {
+            // success;
+            console.log(data.players[data.current_player]) 
+    
+            // update the gamestate
+            data.players[data.current_player].isInHand = false;
+            data.current_player = updateCurPlayer(data.players,data.current_player)
+            // end update to gamestate
+            
+            // update the players array in db
+            const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+            // update current player in db
+            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player)  
+            
+ 
+            Promise.all([updatePlayers, updateCurrentPlayer]).then(values => { 
+                console.log(values);
+                res.status(200).send(values);
+                emitUpdatedGameState(uuid);
+            })
+            .catch(errors => {
+                console.log(error)
+            });  
+        })
+        .catch(error => {
+            // error;
+            console.error(error);
+            res.status(500).send('error: could not get game state');
+        });
 });
 
 module.exports = router;
