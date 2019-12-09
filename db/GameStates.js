@@ -57,14 +57,12 @@ class GameStates {
         });
     }
 
-
-
     static update(uuid, gamestate) {
         return new Promise((resolve, reject) => {
             connection.none('UPDATE gamestates SET state = $1, updated_at = NOW() WHERE id = $2;', [gamestate, uuid])
             .then(() => {
                 // success;
-                console.log('updated game state in db');
+                // console.log('updated game state in db');
                resolve();
             })
             .catch(error => {
@@ -80,8 +78,40 @@ class GameStates {
             connection.none('UPDATE gamestates SET current_player = $1, updated_at = NOW() WHERE id = $2;', [currPLayer, uuid])
             .then(() => {
                 // success;
-                console.log('updated game state in db');
-               resolve('updated game state in db');
+                // console.log('updated current_player in db');
+               resolve('updated updated current_player in db');
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
+    }
+
+    static updatePlayers(uuid, players) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE gamestates SET players = $1, updated_at = NOW() WHERE id = $2;', [JSON.stringify(players), uuid])
+            .then(() => {
+                // success;
+                // console.log('updated players in db');
+               resolve('updated players in db');
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
+    }
+
+    static updatePotAmount(uuid, potAmount) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE gamestates SET pot_amount = $1, updated_at = NOW() WHERE id = $2;', [potAmount, uuid])
+            .then(() => {
+                // success;
+                console.log('updated pot_amount in db');
+               resolve('updated pot_amount in db');
             })
             .catch(error => {
                 // error;

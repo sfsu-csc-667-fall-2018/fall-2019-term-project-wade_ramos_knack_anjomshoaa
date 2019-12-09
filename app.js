@@ -8,6 +8,7 @@ const logger = require('morgan');
 const passport = require('passport');
 // const session = require('express-session')
 // const pgSession = require('connect-pg-simple')(session);
+const cors = require('cors');
 
 // dotenv setup when in development mode
 
@@ -36,9 +37,10 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
+app.use(cors())
 //react 
-app.use(express.static("./build"))
+//app.use(express.static("./build"))
+
 
 // passport setup
 // app.use(express.session({ secret: process.env.SESSION_SECRET }));
