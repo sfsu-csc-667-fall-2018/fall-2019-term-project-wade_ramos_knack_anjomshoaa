@@ -1,12 +1,16 @@
 const express = require('express');
 const router = express.Router();
-
 const GameStates = require("../db/index.js").GameStates;
 
+
 const bet = 1;
+
+const io = require('./socket/socketServer')
+
 /* create a new gamestate object, 
 save it into the gamestates table in postgres, 
 send the json to the client */
+
 
 const updateCurPlayer = (players, current_player) => {
     if(current_player === 8)  
@@ -63,6 +67,10 @@ const emitUpdatedGameState = (uuid) =>{
 }
 
 // react redirect to the build
+
+
+
+
 router.get('/:id', function(request, response, next) {
     response.status(200).sendFile(__basedir + '/build/index.html');
   });

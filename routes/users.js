@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require("../db/index.js");
 const passport = require('../auth/passport').passport;
 
+const io = require('./socket/socketServer')
 /* GET users listing. */
 router.post('/register', function(req, res, next) {
   
@@ -31,6 +32,8 @@ router.post('/login',  passport.authenticate('local', { session: false }), funct
   console.log('User Authenicated');
 
   console.log(req.user);
+  console.log("Here")
+  
 
   res.status(200).send('OK');
 
