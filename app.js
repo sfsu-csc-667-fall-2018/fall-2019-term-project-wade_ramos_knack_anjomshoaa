@@ -39,7 +39,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors())
 //react 
-//app.use(express.static("./build"))
+app.use(express.static("./build"))
 
 
 // passport setup
