@@ -30,10 +30,7 @@ const app = express();
 app.io = require('./routes/socket/socketServer')
 
 
-setTimeout(()=>{
-  console.log("Here in timeout")
-  console.log(app.get('port'))
-},3000)
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
