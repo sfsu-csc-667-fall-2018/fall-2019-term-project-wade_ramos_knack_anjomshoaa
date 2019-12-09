@@ -13,6 +13,8 @@ const cors = require('cors');
 // dotenv setup when in development mode
 
 
+
+
 if(process.env.NODE_ENV === 'development') {
   require('dotenv').config();
 }
@@ -25,12 +27,18 @@ const gameRouter = require('./routes/game')
 const testRouter = require('./routes/test')
 
 const app = express();
+app.io = require('./routes/socket/socketServer')
 
 
+setTimeout(()=>{
+  console.log("Here in timeout")
+  console.log(app.get('port'))
+},3000)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
 
 
 app.use(logger('dev'));

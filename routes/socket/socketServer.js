@@ -1,6 +1,5 @@
-const io = require('socket.io')(3002,{
-    cookie: true
-  })
+const socket = require('socket.io');
+const io = socket();  
 
   let users = [{
       socketId: '',
