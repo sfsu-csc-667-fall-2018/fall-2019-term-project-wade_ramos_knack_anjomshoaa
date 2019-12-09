@@ -5,7 +5,7 @@ const GameStates = require("../db/index.js").GameStates;
 
 const bet = 1;
 
-const io = require('./socket/socketServer').io;
+const io = require('./socket/socketServer');
 
 /* create a new gamestate object, 
 save it into the gamestates table in postgres, 

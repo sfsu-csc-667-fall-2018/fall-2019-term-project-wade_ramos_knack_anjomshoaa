@@ -1,13 +1,6 @@
-const io = require('socket.io')({
-    cookie: true
-  })
-
-  const init = server => {
-    // io.use(({ request }, next) => {
-    //   sessionMiddleware(request, request.res, next);
-    // });
-    io.attach(server);
-  };
+const app = require('../../app');
+const server = require('http').Server(app);
+var io = require('socket.io')(server);
 
   let users = [{
       socketId: '',
@@ -51,4 +44,4 @@ const io = require('socket.io')({
 
 
 
-  module.exports = {io, init};
+  module.exports = io;
