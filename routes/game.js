@@ -86,7 +86,7 @@ router.get('/allGames', (req, res, next) => {
     });
 });
 
-router.get('/createGame', (req, res, next) => {
+router.get('/createGame', (req, res, next) => { 
     GameStates.create()
     .then(gameState => {
         res.status(200).json(gameState.json);
