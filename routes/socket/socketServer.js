@@ -1,12 +1,18 @@
-const io = require('socket.io')(3002,{
+const io = require('socket.io')({
     cookie: true
   })
+
+  const init = server => {
+    // io.use(({ request }, next) => {
+    //   sessionMiddleware(request, request.res, next);
+    // });
+    io.attach(server);
+  };
 
   let users = [{
       socketId: '',
       user: ''
   }]
-
 
  io.on('connection', socket => {
       console.log("Connected")
