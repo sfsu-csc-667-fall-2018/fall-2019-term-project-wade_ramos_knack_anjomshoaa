@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 var app = require('../app');
-const { init: messagingInit } = require('../routes/socket/socketServer');
+const { init: messagingInit } = require('../routes/socket/socketServer.js');
 var debug = require('debug')('fall-2019-term-project-wade-ramos-knack-anjomshoaa:server');
 var http = require('http');
 
