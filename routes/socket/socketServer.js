@@ -1,6 +1,6 @@
-const app = require('../../app');
-const server = require('http').Server(app);
-var io = require('socket.io')(server);
+// const app = require('../../app');
+// const server = require('http').Server(app);
+var io = require('socket.io')(3002);
 
   let users = [{
       socketId: '',
