@@ -51,7 +51,8 @@ const emitUpdatedGameState = (uuid) =>{
         .then((data) => {
             // success;
             console.log('Emiting updated gamestate') 
-    
+            console.log(uuid)
+            io.to(uuid).emit('gameState',data)
             /**
              * AMIR: Use socket.io to send the updated gamestate
              * data = gamestate
@@ -85,7 +86,7 @@ router.get('/allGames', (req, res, next) => {
     });
 });
 
-router.get('/createGame', (req, res, next) => {
+router.get('/createGame', (req, res, next) => { 
     GameStates.create()
     .then(gameState => {
         res.status(200).json(gameState.json);

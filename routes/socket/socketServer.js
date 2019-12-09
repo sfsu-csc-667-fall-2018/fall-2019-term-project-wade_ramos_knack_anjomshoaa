@@ -12,8 +12,6 @@ const io = require('socket.io')(3002,{
       console.log("Connected")
       const socketId = socket.id
       socket.on('join',room => {
-          console.log("Join")
-          console.log(room)
           socket.join(room)
       })
 
