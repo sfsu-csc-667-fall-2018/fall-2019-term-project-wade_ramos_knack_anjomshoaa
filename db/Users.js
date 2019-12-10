@@ -38,18 +38,9 @@ class Users {
         });        
     }
 
-    static create(username, email, password) {
-        
-        console.log('The create function is called');
-        
+    static create(username, email, password) {    
         let uuid = uuidv4();
-
-        console.log('right after uuidv4 call');
-
         return new Promise((resolve, reject) => {
-
-            console.log('the promise is created');
-
             bcrypt.hash(password, saltRounds, function(err, hash) {
                 // Store hash in your password DB.
             connection.none('INSERT INTO public.users(id, name, email, password) VALUES($1, $2, $3, $4)', [uuid, username, email, hash])

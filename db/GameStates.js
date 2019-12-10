@@ -23,7 +23,7 @@ class GameStates {
 
     static getActive() {  
         return new Promise((resolve, reject) => {
-            connection.many('select * from gamestates where is_active = true')
+            connection.many('select id, players from gamestates where is_active = true')
             .then((data) => {
                 // success;
                 //console.log(data)
