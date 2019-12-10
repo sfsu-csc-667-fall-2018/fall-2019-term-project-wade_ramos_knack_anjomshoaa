@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require("../db/index.js");
 const passport = require('../auth/passport').passport;
 
-const io = require('./socket/socketServer')
+const io = require('../socket/socketServer')
 
 router.post('/register', function(req, res, next) {
     // console.log('Username: ', req.body.username);

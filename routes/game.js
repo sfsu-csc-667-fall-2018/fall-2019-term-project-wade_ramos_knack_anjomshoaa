@@ -4,7 +4,7 @@ const GameStates = require("../db/index.js").GameStates;
 
 const bet = 1;
 
-const io = require('./socket/socketServer');
+const io = require('../socket/socketServer');
 
 const updateCurPlayer = (players, current_player) => {
     if(current_player === 8)  
@@ -60,14 +60,24 @@ const emitUpdatedGameState = (uuid) =>{
         });
 }
 
-router.get('/:id', function(request, response, next) {
-    response.status(200).sendFile(__basedir + '/build/index.html');
-  });
-
-router.get('/allGames', (req, res, next) => {
+router.get('/allGames', (req, res, next) => {  
     GameStates.getActive()
     .then(games => {
+        games.forEach(game => {
+            // console.log('game id: ', game.id);   
+            if(game.players !== null) //players is not null
+            {
+                game.player_count = game.players.length
+            }
+            else
+            {
+                game.player_count = 0
+            }
+            delete game.players;
+            // console.log('player_count: ', game.player_count);
+        });
         res.status(200).json(games);
+        // returns the game id's and the number of players in the game
     })
     .catch(error => {
         res.status(500).send(error);
@@ -311,5 +321,9 @@ router.post('/:id/fold', (req, res, next) => {
             res.status(500).send('error: could not get game state');
         });
 });
+
+router.get('/:id', function(request, response, next) {
+    response.status(200).sendFile(__basedir + '/build/index.html');
+  });
 
 module.exports = router;

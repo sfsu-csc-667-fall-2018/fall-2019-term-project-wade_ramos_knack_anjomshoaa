@@ -26,7 +26,7 @@ class GameStates {
             connection.many('select id, players from gamestates where is_active = true')
             .then((data) => {
                 // success;
-                //console.log(data)
+                // console.log(data)
                 resolve(data);
             })
             .catch(error => {

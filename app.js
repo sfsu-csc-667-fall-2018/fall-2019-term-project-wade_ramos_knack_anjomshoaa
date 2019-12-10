@@ -22,7 +22,7 @@ const gameRouter = require('./routes/game')
 const testRouter = require('./routes/test')
 
 const app = express();
-app.io = require('./routes/socket/socketServer')
+app.io = require('./socket/socketServer')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
