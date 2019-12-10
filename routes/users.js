@@ -23,8 +23,6 @@ router.post('/login',  passport.authenticate('local', { session: false }), funct
   // console.log('Username: ', req.body.username);
   // console.log('password: ', req.body.password);
   console.log('User Authenicated');
-  console.log(req.user);
-  console.log("Here")
   res.status(200).send('OK');
 });
 

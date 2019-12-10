@@ -6,6 +6,10 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.get('/login', function(request, response, next) {
+  response.status(200).sendFile(__basedir + '/build/index.html');
+});
+
 router.get('/register', function(request, response, next) {
   response.status(200).sendFile(__basedir + '/build/index.html');
 });
@@ -25,5 +29,7 @@ router.get('/img', function(request, response, next) {
 router.get('/game-lobby', function(request, response, next) {
   response.render('index', {title: 'Game Lobby'});
 });
+
+
 
 module.exports = router;
