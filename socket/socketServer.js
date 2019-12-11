@@ -11,6 +11,7 @@ const io = socket();
       console.log("Connected")
       const socketId = socket.id
       socket.on('join',room => {
+          console.log("Joined Room : " + room)
           socket.join(room)
       })
 

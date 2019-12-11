@@ -130,8 +130,8 @@ router.post('/:id/check', (req, res, next) => {
  
             Promise.all([updateCurrentPlayer]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
             })
             .catch(errors => {
                 console.log(error)
@@ -175,8 +175,9 @@ router.post('/:id/bet', (req, res, next) => {
  
             Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
+                
             })
             .catch(errors => {
                 console.log(error)
@@ -220,8 +221,8 @@ router.post('/:id/raise', (req, res, next) => {
  
             Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
             })
             .catch(errors => {
                 console.log(error)
@@ -267,8 +268,8 @@ router.post('/:id/call', (req, res, next) => {
  
             Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
             })
             .catch(errors => {
                 console.log(error)
@@ -308,8 +309,8 @@ router.post('/:id/fold', (req, res, next) => {
  
             Promise.all([updatePlayers, updateCurrentPlayer]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
             })
             .catch(errors => {
                 console.log(error)
@@ -346,8 +347,8 @@ router.post('/:id/:username/:index/join', (req, res, next) => {
     
             Promise.all([updatePlayers]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);       
             })
             .catch(errors => {
                 console.log(error)
@@ -384,8 +385,8 @@ router.post('/:id/:username/:index/leave', (req, res, next) => {
     
             Promise.all([updatePlayers]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
             })
             .catch(errors => {
                 console.log(error)
