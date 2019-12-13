@@ -112,7 +112,7 @@ router.get('/:id/getGame', (req, res, next) => {
     });
 });
 
-router.post('/:id/check', (req, res, next) => {
+router.post('/:id/:username/check', (req, res, next) => {
 // query the db and get the current gamestate
     // update the current player index
     let uuid = req.params.id
@@ -145,7 +145,7 @@ router.post('/:id/check', (req, res, next) => {
         });
 });
 
-router.post('/:id/bet', (req, res, next) => {
+router.post('/:id/:username/bet', (req, res, next) => {
 // query the db and get the current gamestate
     // update the players array:
         // update the current players current bet
@@ -191,7 +191,7 @@ router.post('/:id/bet', (req, res, next) => {
         });
 });
 
-router.post('/:id/raise', (req, res, next) => {
+router.post('/:id/:username/raise', (req, res, next) => {
     // query the db and get the current gamestate
     // update the players array:
         // update the current players current bet
@@ -238,7 +238,7 @@ router.post('/:id/raise', (req, res, next) => {
         });
 });
 
-router.post('/:id/call', (req, res, next) => {
+router.post('/:id/:username/call', (req, res, next) => {
     // query the db and get the current gamestate
     // update the players array:
         // update the current players current bet
@@ -285,7 +285,7 @@ router.post('/:id/call', (req, res, next) => {
         });
 });
 
-router.post('/:id/fold', (req, res, next) => {
+router.post('/:id/:username/fold', (req, res, next) => {
     // query the db and get the current gamestate
     // update the players array:
         // update the current players isInHand false
