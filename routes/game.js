@@ -67,7 +67,8 @@ router.get('/allGames', (req, res, next) => {
             // console.log('game id: ', game.id);   
             if(game.players !== null) //players is not null
             {
-                game.player_count = game.players.length
+                console.log(game.players)
+                game.player_count = game.players.length;
             }
             else
             {
@@ -84,10 +85,10 @@ router.get('/allGames', (req, res, next) => {
     });
 });
 
-router.get('/createGame', (req, res, next) => { 
-    GameStates.create()
-    .then(gameState => {
-        res.status(200).json(gameState.json);
+router.post('/:username/createGame', (req, res, next) => { 
+    GameStates.create(req.params.username)
+    .then(gamestate => {
+        res.status(200).json(gamestate.id);
     })
     .catch(error => {
         res.status(500).send(error);
@@ -340,12 +341,19 @@ router.post('/:id/:username/:index/join', (req, res, next) => {
             // update the gamestate
             data.players[joinIndex].username = userName;
             data.players[joinIndex].isInHand = true;
+            if(data.players[joinIndex].holeCards.lenght === 0)
+            {
+            data.players[joinIndex].holeCards.push(data.deck.pop())
+            data.players[joinIndex].holeCards.push(data.deck.pop())
+            }
             // end update to gamestate
             
             // update the players array in db
-            const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+            const updatePlayers = GameStates.updatePlayers(uuid, data.players)
+            // update the deck in db
+            const updateDeck = GameStates.updateDeck(uuid, data.deck)
     
-            Promise.all([updatePlayers]).then(values => { 
+            Promise.all([updatePlayers, updateDeck]).then(values => { 
                 console.log(values);
                 emitUpdatedGameState(uuid);
                 res.status(200).send(values);       
@@ -368,16 +376,31 @@ router.post('/:id/:username/leave', (req, res, next) => {
     
     let uuid = req.params.id;
     let userName = req.params.username;
-    let joinIndex = req.params.index;
+    let found = false;
+    let joinIndex = 0;
     
         // query the db and get the current gamestate
         GameStates.get(uuid)
         .then((data) => {
             // success;
-    
+
+            //find the users index in players
+            for(let i = 0; i < data.players.length; ++i)
+            {
+                if(data.players[i].username === userName)
+                {
+                    joinIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+
             // update the gamestate
+            if(found === true)
+            {
             data.players[joinIndex].username = null;
             data.players[joinIndex].isInHand = false;
+            }
             // end update to gamestate
             
             // update the players array in db
