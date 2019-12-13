@@ -361,7 +361,7 @@ router.post('/:id/:username/:index/join', (req, res, next) => {
         });
 });
 
-router.post('/:id/:username/:index/leave', (req, res, next) => {
+router.post('/:id/:username/leave', (req, res, next) => {
     // query the db and get the current gamestate
     // update the players array:
         // find the first instance of a null username and update that
