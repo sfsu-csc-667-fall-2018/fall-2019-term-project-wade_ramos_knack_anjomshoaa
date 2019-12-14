@@ -125,6 +125,7 @@ class State {
                     , last_raised: 0
                     , current_player: 3
                     , players: players
+                    , betting_round: 0
                 }
 
                 return record
