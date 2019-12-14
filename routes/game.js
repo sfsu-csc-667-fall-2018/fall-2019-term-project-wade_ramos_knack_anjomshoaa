@@ -36,7 +36,26 @@ const updateCurPlayer = (players, current_player) => {
     }
 }
 
-const emitUpdatedGameState = (uuid) =>{
+const dealCards = (gamestate) => {
+    
+    return new Promise((resolve, reject) => {
+        for(let i = 0; i < 5; i++)
+        {
+            gamestate.community_cards.push(gamestate.deck.pop())
+        }
+    
+        gamestate.players.forEach(player => {
+            if(player.username !== null && player.isInHand === true)
+            {
+                player.holeCards.push(gamestate.deck.pop());
+                player.holeCards.push(gamestate.deck.pop());
+            }
+        })
+        resolve(gamestate);
+    });
+}
+
+const emitUpdatedGameState = (uuid) => {
     // websocket logic will go here
     // this function will be called after every 
     // endpoint finished updating the db.
@@ -67,7 +86,7 @@ router.get('/allGames', (req, res, next) => {
             // console.log('game id: ', game.id);   
             if(game.players !== null) //players is not null
             {
-                console.log(game.players)
+                //console.log(game.players)
                 game.player_count = game.players.length;
             }
             else
@@ -337,14 +356,46 @@ router.post('/:id/:username/:index/join', (req, res, next) => {
         GameStates.get(uuid)
         .then((data) => {
             // success;
+            let canJoin = true;
+            let player_count = 0
+            //check if the username is already in the game
+            for(let i = 0; i < data.players.length; ++i)
+            {
+                if(data.players[i].username === userName)
+                {
+                    // the player is already in the game
+                    canJoin = false;
+                }
+                else
+                {
+                    // the player is not in the game. count active players
+                    if(data.players[i].username !== null && data.players[i].isInHand === true)
+                    { 
+                        player_count++;
+                    }      
+                }
+            }
     
             // update the gamestate
-            data.players[joinIndex].username = userName;
-            data.players[joinIndex].isInHand = true;
-            if(data.players[joinIndex].holeCards.lenght === 0)
+            if(canJoin)
             {
-            data.players[joinIndex].holeCards.push(data.deck.pop())
-            data.players[joinIndex].holeCards.push(data.deck.pop())
+                data.players[joinIndex].username = userName;
+                data.players[joinIndex].isInHand = true;
+                if(data.players[joinIndex].holeCards.lenght === 0)
+                {
+                    data.players[joinIndex].holeCards.push(data.deck.pop());
+                    data.players[joinIndex].holeCards.push(data.deck.pop());
+                }
+            }
+            // console.log(player_count)
+
+            if(player_count >= 1)
+            {
+                dealCards(data).then(updatedGameState => {
+                    data = updatedGameState
+                }).catch(err => {
+                    console.log(err)
+                })
             }
             // end update to gamestate
             
@@ -352,8 +403,10 @@ router.post('/:id/:username/:index/join', (req, res, next) => {
             const updatePlayers = GameStates.updatePlayers(uuid, data.players)
             // update the deck in db
             const updateDeck = GameStates.updateDeck(uuid, data.deck)
+            // update community cards in db
+            const updateCommunityCards = GameStates.updateCommunityCards(uuid,data.community_cards)
     
-            Promise.all([updatePlayers, updateDeck]).then(values => { 
+            Promise.all([updatePlayers, updateDeck, updateCommunityCards]).then(values => { 
                 console.log(values);
                 emitUpdatedGameState(uuid);
                 res.status(200).send(values);       

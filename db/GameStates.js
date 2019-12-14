@@ -166,12 +166,28 @@ class GameStates {
         });
     }
 
+    static updateCommunityCards(uuid, communityCards) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE gamestates SET community_cards = $1, updated_at = NOW() WHERE id = $2;', [JSON.stringify(communityCards), uuid])
+            .then(() => {
+                // success;
+                // console.log('updated players in db');
+               resolve('updated community cards in db');
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
+    }
+
     static updatePotAmount(uuid, potAmount) {
         return new Promise((resolve, reject) => {
             connection.none('UPDATE gamestates SET pot_amount = $1, updated_at = NOW() WHERE id = $2;', [potAmount, uuid])
             .then(() => {
                 // success;
-                console.log('updated pot_amount in db');
+                //console.log('updated pot_amount in db');
                resolve('updated pot_amount in db');
             })
             .catch(error => {

@@ -105,15 +105,11 @@ class State {
             }
           ]
           
-          let communityCards =  [
-            _deck.pop(), _deck.pop(), _deck.pop(), _deck.pop(), _deck.pop()
-          ]
+          let communityCards =  []
 
         players[0].username = _username;
         players[0].isInHand = true;
-        players[0].holeCards.push(_deck.pop())
-        players[0].holeCards.push(_deck.pop())
-
+  
         let record =
                 {
                     id: _id
