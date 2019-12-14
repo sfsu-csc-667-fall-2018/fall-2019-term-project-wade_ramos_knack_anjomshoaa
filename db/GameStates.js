@@ -168,13 +168,29 @@ class GameStates {
         });
     }
 
+    static updateBettingRound(uuid, round) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE gamestates SET betting_round = $1, updated_at = NOW() WHERE id = $2;', [round, uuid])
+            .then(() => {
+                // success;
+                // console.log('updated players in db');
+               resolve('updated betting_round in db');
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
+    }
+
     static updateCommunityCards(uuid, communityCards) {
         return new Promise((resolve, reject) => {
             connection.none('UPDATE gamestates SET community_cards = $1, updated_at = NOW() WHERE id = $2;', [JSON.stringify(communityCards), uuid])
             .then(() => {
                 // success;
                 // console.log('updated players in db');
-               resolve('updated community cards in db');
+               resolve('updated community_cards in db');
             })
             .catch(error => {
                 // error;
