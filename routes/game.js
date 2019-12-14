@@ -54,6 +54,9 @@ const dealCards = (gamestate) => {
                 }
             }
         })
+
+        gamestate.betting_round = 1;
+
         resolve(gamestate);
     });
 }
@@ -401,6 +404,7 @@ router.post('/:id/:username/:index/join', (req, res, next) => {
 
             if(player_count >= 1)
             {
+                // note that dealCards also updated the betting_round
                 dealCards(data).then(updatedGameState => {
                     data = updatedGameState
                 }).catch(err => {
@@ -415,8 +419,10 @@ router.post('/:id/:username/:index/join', (req, res, next) => {
             const updateDeck = GameStates.updateDeck(uuid, data.deck)
             // update community cards in db
             const updateCommunityCards = GameStates.updateCommunityCards(uuid,data.community_cards)
+
+            const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round)
     
-            Promise.all([updatePlayers, updateDeck, updateCommunityCards]).then(values => { 
+            Promise.all([updatePlayers, updateDeck, updateCommunityCards, updateBettingRound]).then(values => { 
                 console.log(values);
                 emitUpdatedGameState(uuid);
                 res.status(200).send(values);       
