@@ -6,23 +6,23 @@ const io = socket();
       user: ''
   }]
 
-
  io.on('connection', socket => {
-      console.log("Connected")
+      console.log("Incoming Socket Request on: ", socket.id)
       const socketId = socket.id
-      socket.on('join',room => {
-          socket.join(room)
-      })
 
-      socket.on('income-msg',({msg,user}) => {
+    socket.on('join',room => {
+          console.log("Joined Room: " + room)
+          socket.join(room)
+    })
+
+    socket.on('income-msg',({msg,user}) => {
         
         console.log(msg)
         console.log(user)
         users.push({socketId,user})
-        
+        //console.log(users)
         io.to('lobby').emit('chat',{incomeMsg: msg, user:user})
     })  
-    console.log(users)
 
     socket.on('disconnect', () => {
         console.log('Disconnected')
@@ -34,14 +34,13 @@ const io = socket();
         console.log(users)
     })
 
-
+    socket.on('leaveRoom', (uuid) => {
+       console.log('Left Room: ', uuid);
+       socket.leave(uuid);
+    })
 
   })
 
   //Chat 
-
-
-
-
 
   module.exports = io;

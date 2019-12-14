@@ -23,10 +23,10 @@ class GameStates {
 
     static getActive() {  
         return new Promise((resolve, reject) => {
-            connection.many('select * from gamestates where is_active = true')
+            connection.many('select id, players from gamestates where is_active = true')
             .then((data) => {
                 // success;
-                //console.log(data)
+                // console.log(data)
                 resolve(data);
             })
             .catch(error => {
@@ -37,16 +37,63 @@ class GameStates {
         });
     }
 
-    static create() {
-        console.log('GameStates.js : called to create()');
-        let gamestate = new GameState(uuidv4());
+/** 
+    id: _id
+    , created_at: 'NOW()'
+    , updated_at: 'NOW()'
+    , deck: _deck
+    , pot_amount: 0
+    , player_count: 1
+    , community_cards: JSON.stringify(communityCards)
+    , player_ranking: null
+    , is_active: true
+    , dealer: 0
+    , last_raised: 0
+    , current_player: 3
+    , players: JSON.stringify(players) 
+*/
 
-        console.log('temp state obj created');
+    static create(username) {
+        // console.log('GameStates.js : called to create()');
+        let gamestate = new GameState(uuidv4(), username);
+        // console.log(gamestate)
+
+        let query = `INSERT INTO gamestates(
+            id, 
+            created_at, 
+            updated_at,
+            deck,
+            pot_amount,
+            player_count,
+            community_cards,
+            player_ranking,
+            is_active,
+            dealer,
+            last_raised,
+            current_player,
+            players,
+            betting_round
+            ) 
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`;
+
         return new Promise((resolve, reject) => {
-            connection.none('INSERT INTO gamestates(id, created_at, updated_at,is_active) VALUES($1, NOW(), NOW(), $2)', [gamestate.uuid, true])
+            connection.none(query, [gamestate.id, 
+                                    gamestate.created_at, 
+                                    gamestate.updated_at, 
+                                    JSON.stringify(gamestate.deck),
+                                    gamestate.pot_amount,
+                                    gamestate.player_count,
+                                    JSON.stringify(gamestate.community_cards),
+                                    gamestate.player_ranking,
+                                    gamestate.is_active,
+                                    gamestate.dealer,
+                                    gamestate.last_raised,
+                                    gamestate.current_player,
+                                    JSON.stringify(gamestate.players),
+                                    gamestate.betting_round])
             .then(() => {
                 // success;
-                console.log('new game state added to db: ', gamestate)
+                console.log('new game state added to db');
                 resolve(gamestate);
             })
             .catch(error => {
@@ -105,12 +152,44 @@ class GameStates {
         });
     }
 
+    static updateDeck(uuid, deck) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE gamestates SET deck = $1, updated_at = NOW() WHERE id = $2;', [JSON.stringify(deck), uuid])
+            .then(() => {
+                // success;
+                // console.log('updated players in db');
+               resolve('updated deck in db');
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
+    }
+
+    static updateCommunityCards(uuid, communityCards) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE gamestates SET community_cards = $1, updated_at = NOW() WHERE id = $2;', [JSON.stringify(communityCards), uuid])
+            .then(() => {
+                // success;
+                // console.log('updated players in db');
+               resolve('updated community cards in db');
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
+    }
+
     static updatePotAmount(uuid, potAmount) {
         return new Promise((resolve, reject) => {
             connection.none('UPDATE gamestates SET pot_amount = $1, updated_at = NOW() WHERE id = $2;', [potAmount, uuid])
             .then(() => {
                 // success;
-                console.log('updated pot_amount in db');
+                //console.log('updated pot_amount in db');
                resolve('updated pot_amount in db');
             })
             .catch(error => {

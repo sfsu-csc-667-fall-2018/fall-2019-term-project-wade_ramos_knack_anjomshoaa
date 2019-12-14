@@ -2,15 +2,9 @@ const express = require('express');
 const router = express.Router();
 const GameStates = require("../db/index.js").GameStates;
 
-
 const bet = 1;
 
-const io = require('./socket/socketServer');
-
-/* create a new gamestate object, 
-save it into the gamestates table in postgres, 
-send the json to the client */
-
+const io = require('../socket/socketServer');
 
 const updateCurPlayer = (players, current_player) => {
     if(current_player === 8)  
@@ -42,7 +36,29 @@ const updateCurPlayer = (players, current_player) => {
     }
 }
 
-const emitUpdatedGameState = (uuid) =>{
+const dealCards = (gamestate) => {
+    
+    return new Promise((resolve, reject) => {
+        for(let i = 0; i < 5; i++)
+        {
+            gamestate.community_cards.push(gamestate.deck.pop())
+        }
+    
+        gamestate.players.forEach(player => {
+            if(player.username !== null && player.isInHand === true)
+            {
+                if(player.holeCards.length <= 2)
+                {
+                player.holeCards.push(gamestate.deck.pop());
+                player.holeCards.push(gamestate.deck.pop());
+                }
+            }
+        })
+        resolve(gamestate);
+    });
+}
+
+const emitUpdatedGameState = (uuid) => {
     // websocket logic will go here
     // this function will be called after every 
     // endpoint finished updating the db.
@@ -58,7 +74,6 @@ const emitUpdatedGameState = (uuid) =>{
              * data = gamestate
              * uuid = the room I am sending this to
              */
-
         })
         .catch(error => {
             // error;
@@ -67,29 +82,42 @@ const emitUpdatedGameState = (uuid) =>{
         });
 }
 
-// react redirect to the build
-
-
-
-
-router.get('/:id', function(request, response, next) {
-    response.status(200).sendFile(__basedir + '/build/index.html');
-  });
-
-router.get('/allGames', (req, res, next) => {
+router.get('/allGames', (req, res, next) => {  
     GameStates.getActive()
     .then(games => {
+        games.forEach(game => {
+            // console.log('game id: ', game.id);   
+            if(game.players !== null) //players is not null
+            {
+                //console.log(game.players)
+                let numPlayers = 0;
+                game.players.forEach(player => {
+                    if(player.username !== null)
+                    {
+                        numPlayers++;
+                    }
+                })
+                game.player_count = numPlayers;
+            }
+            else
+            {
+                game.player_count = 0
+            }
+            delete game.players;
+            // console.log('player_count: ', game.player_count);
+        });
         res.status(200).json(games);
+        // returns the game id's and the number of players in the game
     })
     .catch(error => {
         res.status(500).send(error);
     });
 });
 
-router.get('/createGame', (req, res, next) => { 
-    GameStates.create()
-    .then(gameState => {
-        res.status(200).json(gameState.json);
+router.post('/:username/createGame', (req, res, next) => { 
+    GameStates.create(req.params.username)
+    .then(gamestate => {
+        res.status(200).json(gamestate.id);
     })
     .catch(error => {
         res.status(500).send(error);
@@ -113,7 +141,7 @@ router.get('/:id/getGame', (req, res, next) => {
     });
 });
 
-router.post('/:id/check', (req, res, next) => {
+router.post('/:id/:username/check', (req, res, next) => {
 // query the db and get the current gamestate
     // update the current player index
     let uuid = req.params.id
@@ -132,8 +160,8 @@ router.post('/:id/check', (req, res, next) => {
  
             Promise.all([updateCurrentPlayer]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
             })
             .catch(errors => {
                 console.log(error)
@@ -146,7 +174,7 @@ router.post('/:id/check', (req, res, next) => {
         });
 });
 
-router.post('/:id/bet', (req, res, next) => {
+router.post('/:id/:username/bet', (req, res, next) => {
 // query the db and get the current gamestate
     // update the players array:
         // update the current players current bet
@@ -177,8 +205,9 @@ router.post('/:id/bet', (req, res, next) => {
  
             Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
+                
             })
             .catch(errors => {
                 console.log(error)
@@ -191,7 +220,7 @@ router.post('/:id/bet', (req, res, next) => {
         });
 });
 
-router.post('/:id/raise', (req, res, next) => {
+router.post('/:id/:username/raise', (req, res, next) => {
     // query the db and get the current gamestate
     // update the players array:
         // update the current players current bet
@@ -222,8 +251,8 @@ router.post('/:id/raise', (req, res, next) => {
  
             Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
             })
             .catch(errors => {
                 console.log(error)
@@ -238,7 +267,7 @@ router.post('/:id/raise', (req, res, next) => {
         });
 });
 
-router.post('/:id/call', (req, res, next) => {
+router.post('/:id/:username/call', (req, res, next) => {
     // query the db and get the current gamestate
     // update the players array:
         // update the current players current bet
@@ -269,8 +298,8 @@ router.post('/:id/call', (req, res, next) => {
  
             Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
             })
             .catch(errors => {
                 console.log(error)
@@ -285,7 +314,7 @@ router.post('/:id/call', (req, res, next) => {
         });
 });
 
-router.post('/:id/fold', (req, res, next) => {
+router.post('/:id/:username/fold', (req, res, next) => {
     // query the db and get the current gamestate
     // update the players array:
         // update the current players isInHand false
@@ -310,8 +339,8 @@ router.post('/:id/fold', (req, res, next) => {
  
             Promise.all([updatePlayers, updateCurrentPlayer]).then(values => { 
                 console.log(values);
-                res.status(200).send(values);
                 emitUpdatedGameState(uuid);
+                res.status(200).send(values);
             })
             .catch(errors => {
                 console.log(error)
@@ -323,5 +352,157 @@ router.post('/:id/fold', (req, res, next) => {
             res.status(500).send('error: could not get game state');
         });
 });
+
+router.post('/:id/:username/:index/join', (req, res, next) => {
+    // query the db and get the current gamestate
+    // update the players array:
+        // find the first instance of a null username and update that
+    
+    let uuid = req.params.id;
+    let userName = req.params.username;
+    let joinIndex = req.params.index;
+
+        // query the db and get the current gamestate
+        GameStates.get(uuid)
+        .then((data) => {
+            // success;
+            let canJoin = true;
+            let player_count = 0
+            //check if the username is already in the game
+            for(let i = 0; i < data.players.length; ++i)
+            {
+                if(data.players[i].username === userName)
+                {
+                    // the player is already in the game
+                    canJoin = false;
+                }
+                else
+                {
+                    // the player is not in the game. count active players
+                    if(data.players[i].username !== null && data.players[i].isInHand === true)
+                    { 
+                        player_count++;
+                    }      
+                }
+            }
+    
+            // update the gamestate
+            if(canJoin)
+            {
+                data.players[joinIndex].username = userName;
+                data.players[joinIndex].isInHand = true;
+                if(data.players[joinIndex].holeCards.lenght === 0)
+                {
+                    data.players[joinIndex].holeCards.push(data.deck.pop());
+                    data.players[joinIndex].holeCards.push(data.deck.pop());
+                }
+            }
+            console.log(player_count)
+
+            if(player_count >= 1)
+            {
+                dealCards(data).then(updatedGameState => {
+                    data = updatedGameState
+                }).catch(err => {
+                    console.log(err)
+                })
+            }
+            // end update to gamestate
+            
+            // update the players array in db
+            const updatePlayers = GameStates.updatePlayers(uuid, data.players)
+            // update the deck in db
+            const updateDeck = GameStates.updateDeck(uuid, data.deck)
+            // update community cards in db
+            const updateCommunityCards = GameStates.updateCommunityCards(uuid,data.community_cards)
+    
+            Promise.all([updatePlayers, updateDeck, updateCommunityCards]).then(values => { 
+                console.log(values);
+                emitUpdatedGameState(uuid);
+                res.status(200).send(values);       
+            })
+            .catch(errors => {
+                console.log(error)
+            });  
+        })
+        .catch(error => {
+            // error;
+            console.error(error);
+            res.status(500).send('error: could not get game state');
+        });
+});
+
+router.post('/:id/:username/leave', (req, res, next) => {
+    // query the db and get the current gamestate
+    // update the players array:
+        // find the first instance of a null username and update that
+    
+    let uuid = req.params.id;
+    let userName = req.params.username;
+    let found = false;
+    let joinIndex = 0;
+    
+        // query the db and get the current gamestate
+        GameStates.get(uuid)
+        .then((data) => {
+            // success;
+            let player_count = 0
+            //find the users index in players
+            for(let i = 0; i < data.players.length; ++i)
+            {
+                if(data.players[i].username === userName)
+                {
+                    joinIndex = i;
+                    found = true;
+                    break;
+                }
+                else
+                {
+                    // the player is not in the game. count active players
+                    if(data.players[i].username !== null && data.players[i].isInHand === true)
+                    { 
+                        player_count++;
+                    }      
+                }
+            }
+
+            // update the gamestate
+            if(found === true)
+            {
+            data.players[joinIndex].username = null;
+            data.players[joinIndex].isInHand = false;
+            data.players[joinIndex].holeCards = [];
+            }
+            // end update to gamestate
+            console.log(player_count);
+            if(player_count <= 1)
+            {
+                data.players.forEach(player => {
+                    player.holeCards = [];
+                })
+            }
+            
+            // update the players array in db
+            const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+    
+            Promise.all([updatePlayers]).then(values => { 
+                console.log(values);
+                emitUpdatedGameState(uuid);
+                res.status(200).send(values);
+            })
+            .catch(errors => {
+                console.log(error)
+            });  
+        })
+        .catch(error => {
+            // error;
+            console.error(error);
+            res.status(500).send('error: could not get game state');
+        });
+});
+
+router.get('/:id', function(request, response, next) {
+    response.status(200).sendFile(__basedir + '/build/index.html');
+  });
 
 module.exports = router;
