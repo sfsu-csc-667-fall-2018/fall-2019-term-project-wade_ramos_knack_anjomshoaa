@@ -47,8 +47,11 @@ const dealCards = (gamestate) => {
         gamestate.players.forEach(player => {
             if(player.username !== null && player.isInHand === true)
             {
+                if(player.holeCards.length <= 2)
+                {
                 player.holeCards.push(gamestate.deck.pop());
                 player.holeCards.push(gamestate.deck.pop());
+                }
             }
         })
         resolve(gamestate);
@@ -87,7 +90,14 @@ router.get('/allGames', (req, res, next) => {
             if(game.players !== null) //players is not null
             {
                 //console.log(game.players)
-                game.player_count = game.players.length;
+                let numPlayers = 0;
+                game.players.forEach(player => {
+                    if(player.username !== null)
+                    {
+                        numPlayers++;
+                    }
+                })
+                game.player_count = numPlayers;
             }
             else
             {
@@ -387,7 +397,7 @@ router.post('/:id/:username/:index/join', (req, res, next) => {
                     data.players[joinIndex].holeCards.push(data.deck.pop());
                 }
             }
-            // console.log(player_count)
+            console.log(player_count)
 
             if(player_count >= 1)
             {
@@ -436,7 +446,7 @@ router.post('/:id/:username/leave', (req, res, next) => {
         GameStates.get(uuid)
         .then((data) => {
             // success;
-
+            let player_count = 0
             //find the users index in players
             for(let i = 0; i < data.players.length; ++i)
             {
@@ -446,6 +456,14 @@ router.post('/:id/:username/leave', (req, res, next) => {
                     found = true;
                     break;
                 }
+                else
+                {
+                    // the player is not in the game. count active players
+                    if(data.players[i].username !== null && data.players[i].isInHand === true)
+                    { 
+                        player_count++;
+                    }      
+                }
             }
 
             // update the gamestate
@@ -453,8 +471,16 @@ router.post('/:id/:username/leave', (req, res, next) => {
             {
             data.players[joinIndex].username = null;
             data.players[joinIndex].isInHand = false;
+            data.players[joinIndex].holeCards = [];
             }
             // end update to gamestate
+            console.log(player_count);
+            if(player_count <= 1)
+            {
+                data.players.forEach(player => {
+                    player.holeCards = [];
+                })
+            }
             
             // update the players array in db
             const updatePlayers = GameStates.updatePlayers(uuid, data.players) 

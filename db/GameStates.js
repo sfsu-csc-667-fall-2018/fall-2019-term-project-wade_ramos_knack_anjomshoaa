@@ -71,9 +71,10 @@ class GameStates {
             dealer,
             last_raised,
             current_player,
-            players
+            players,
+            betting_round
             ) 
-            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`;
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`;
 
         return new Promise((resolve, reject) => {
             connection.none(query, [gamestate.id, 
@@ -88,7 +89,8 @@ class GameStates {
                                     gamestate.dealer,
                                     gamestate.last_raised,
                                     gamestate.current_player,
-                                    JSON.stringify(gamestate.players)])
+                                    JSON.stringify(gamestate.players),
+                                    gamestate.betting_round])
             .then(() => {
                 // success;
                 console.log('new game state added to db');
