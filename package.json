@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "SET \"NODE_ENV=development\" SET DEBUG=myapp:* & node ./bin/www",
+    "start": "node ./bin/www",
+    "start:dev:once": "SET \"NODE_ENV=development\" SET DEBUG=myapp:* & node ./bin/www",
     "start:dev": "SET \"NODE_ENV=development\" SET DEBUG=myapp:* & nodemon ./bin/www",
     "start:mac": "NODE_ENV=development DEBUG=APP_NAME:* nodemon ./bin/www",
     "db:create:migration": "sequelize migration:generate --name ",
