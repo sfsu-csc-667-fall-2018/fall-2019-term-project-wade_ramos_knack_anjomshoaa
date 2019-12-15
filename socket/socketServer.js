@@ -1,5 +1,7 @@
 const socket = require('socket.io');
-const io = socket();  
+const io = socket(); 
+
+//const chat = io.of('/chat')
 
   let users = [{
       socketId: '',
@@ -8,6 +10,7 @@ const io = socket();
 
  io.on('connection', socket => {
       console.log("Incoming Socket Request on: ", socket.id)
+      //console.log("Connected")
       const socketId = socket.id
 
     socket.on('join',room => {
@@ -26,6 +29,7 @@ const io = socket();
      })
 
     socket.on('disconnect', () => {
+        socket.disconnect(  )
         console.log('Disconnected')
     })
 
