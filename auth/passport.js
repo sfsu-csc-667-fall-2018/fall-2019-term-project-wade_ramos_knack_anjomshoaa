@@ -29,7 +29,7 @@ const Users = require('../db/index.js').Users;
             return done(null, false)
           }
 
-          console.log(user)
+          //console.log('User Authenticated:', user)
           return done(null, user)
         })
       })      

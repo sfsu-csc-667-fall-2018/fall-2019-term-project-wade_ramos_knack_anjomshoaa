@@ -136,6 +136,22 @@ class GameStates {
         });
     }
 
+    static updateLastRaised(uuid, lastRaised) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE gamestates SET last_raised = $1, updated_at = NOW() WHERE id = $2;', [lastRaised, uuid])
+            .then(() => {
+                // success;
+                // console.log('updated current_player in db');
+               resolve('updated updated last_raised in db');
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
+    }
+
     static updatePlayers(uuid, players) {
         return new Promise((resolve, reject) => {
             connection.none('UPDATE gamestates SET players = $1, updated_at = NOW() WHERE id = $2;', [JSON.stringify(players), uuid])

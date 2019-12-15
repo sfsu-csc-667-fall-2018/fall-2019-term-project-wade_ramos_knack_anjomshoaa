@@ -11,7 +11,7 @@ router.post('/register', function(req, res, next) {
     // console.log('password: ', req.body.password);
     db.Users.create(req.body.username, req.body.email, req.body.password)
     .then(uuid => {
-      console.log(uuid);
+      console.log("User created: ", uuid);
     })
     .catch(error => {
       console.log(error);
@@ -20,9 +20,7 @@ router.post('/register', function(req, res, next) {
 });
 
 router.post('/login',  passport.authenticate('local', { session: false }), function(req, res, next) {
-  // console.log('Username: ', req.body.username);
-  // console.log('password: ', req.body.password);
-  console.log('User Authenicated');
+  // console.log('User Authenicated');
   res.status(200).send('OK');
 });
 

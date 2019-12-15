@@ -11,7 +11,7 @@ const io = socket();
       const socketId = socket.id
 
     socket.on('join',room => {
-          console.log("Joined Room: " + room)
+        //   console.log("Joined Room: " + room)
           socket.join(room)
     })
 
@@ -21,7 +21,7 @@ const io = socket();
     })  
 
     socket.on('leaveRoom', ({path}) => {
-        console.log('Left Room: ', path);
+        // console.log('Left Room: ', path);
         socket.leave(path);
      })
 
