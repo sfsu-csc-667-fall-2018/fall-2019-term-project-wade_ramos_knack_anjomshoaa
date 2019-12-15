@@ -27,11 +27,6 @@ const io = socket();
 
     socket.on('disconnect', () => {
         console.log('Disconnected')
-        users.forEach(user => {
-            if(user.socketId === socket.id){
-                users.splice(users.indexOf(user),1)
-            }
-        })
     })
 
    
