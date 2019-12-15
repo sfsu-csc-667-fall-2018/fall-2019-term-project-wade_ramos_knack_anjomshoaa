@@ -37,5 +37,5 @@ const io = socket();
    
 
   })
-  
+
   module.exports = io;
