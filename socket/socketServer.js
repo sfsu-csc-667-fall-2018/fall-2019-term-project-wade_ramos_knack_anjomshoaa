@@ -15,28 +15,22 @@ const io = socket();
           socket.join(room)
     })
 
-    socket.on('income-msg',({msg,user}) => {
-        
-        console.log(msg)
-        console.log(user)
+    socket.on('income-msg',({msg,user,path}) => {
         users.push({socketId,user})
-        //console.log(users)
-        io.to('lobby').emit('chat',{incomeMsg: msg, user:user})
+        io.to(path).emit('chat',{incomeMsg: msg, user:user})
     })  
+
+    socket.on('leaveRoom', ({path}) => {
+        console.log('Left Room: ', path);
+        socket.leave(path);
+     })
 
     socket.on('disconnect', () => {
         console.log('Disconnected')
-       
-        
     })
 
-    socket.on('leaveRoom', (uuid) => {
-       console.log('Left Room: ', uuid);
-       socket.leave(uuid);
-    })
+   
 
   })
-
-  //Chat 
-
+  
   module.exports = io;
