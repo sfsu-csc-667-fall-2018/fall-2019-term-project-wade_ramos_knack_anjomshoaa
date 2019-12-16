@@ -2,15 +2,13 @@ var Hand = require('pokersolver').Hand;
 
 let hands = [{
     index: '',
-    current: []
+    current: [],
+    name: null
 }]
 
 let midHand = []
 let userHand = []
 let solveHands = []
-
-
-
 
 const winner = (fiveCard, users) => {
     
@@ -32,6 +30,7 @@ const winner = (fiveCard, users) => {
         }
     }
     for(let i=0; i<users.length; i++){
+        // console.log(i)
        for(let j=0; j<2; j++){
         if(users[i].isInHand === true)
         {   
@@ -49,40 +48,25 @@ const winner = (fiveCard, users) => {
                     //console.log(userHand)
                     userHand = userHand.concat(midHand)
                     hands.push({
-                        index: i, current:userHand 
+                        index: i, current:userHand, name: users[i].username
                     })
                     userHand = []
-                }
-                
-         
-                
-        }
-       
-        
+                }    
+        } 
     }
 }
-console.log(hands.length)
+// console.log(hands)
 for(let i =1; i < hands.length; i++){
     solveHands.push(Hand.solve(hands[i].current))
 }
 
 for(let i = 0; i < solveHands.length; i++){
-
-    if(Hand.winners([...solveHands]).toString() === solveHands[0].toString()){
-
-        return i;   
+        if(Hand.winners([...solveHands]).toString() === solveHands[i].toString()){
+            return (hands[i+1].index);   
+        } 
     }
-    
-    
-}
-   
 }   
 
-
-
-winner(["5W","8C","5S","6S","7P"],[{"username":"jon","isInHand":true,"chipCount":200,"currentBet":0,"holeCards":["7S","9C"]},{"username":"selina","isInHand":true,"chipCount":200,"currentBet":0,"holeCards":["TP","JS"]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]}])
-
-
-
+// winner(["5W","8C","5S","6S","7P"],[{"username":"jon","isInHand":true,"chipCount":200,"currentBet":0,"holeCards":["7S","9C"]},{"username":"selina","isInHand":true,"chipCount":200,"currentBet":0,"holeCards":["TP","JS"]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]},{"username":null,"isInHand":false,"chipCount":200,"currentBet":0,"holeCards":[]}])
 
 module.exports.winner = winner

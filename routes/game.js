@@ -132,7 +132,7 @@ router.get('/allGames', (req, res, next) => {
 });
 
 router.get('/testCheckHands', (req, res, next) => {  
-    let uuid = "fd606c0c-bfa0-4e67-a0ae-32f73f6ec169"
+    let uuid = "15d119e0-65eb-4383-af94-818e84fdf5e6"
     GameStates.get(uuid)
         .then((data) => {
             // success;
@@ -203,8 +203,9 @@ router.post('/:id/:username/check', (req, res, next) => {
                     if(data.betting_round >= 5)
                     {
                         console.log('round over')
+                        let winnerIndex = checkHands.winner(data.community_cards, data.players);
+                        data.players[winnerIndex].chipCount += data.pot_amount;
                     }
-
                 }
 
                 // update current player in db
@@ -252,8 +253,6 @@ router.post('/:id/:username/call', (req, res, next) => {
             data.players[data.current_player].chipCount -= bet;
             data.pot_amount += bet; 
 
-           
-
             updateCurPlayer(data.players,data.current_player).then(index => {
                 data.current_player = index;
 
@@ -263,6 +262,14 @@ router.post('/:id/:username/call', (req, res, next) => {
                     // increment betting round.
                     data.betting_round += 1;
                     data.last_raised = -1;
+
+                    if(data.betting_round >= 5)
+                    {
+                        let winnerIndex = checkHands.winner(data.community_cards, data.players);
+                        data.players[winnerIndex].chipCount += data.pot_amount;
+                        console.log('round over \nWinner: ',data.players[winnerIndex]);
+                        console.log('Winnings: ', data.players[winnerIndex].chipCount);
+                    }
                 }
 
                 // update the players array in db
