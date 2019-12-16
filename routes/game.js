@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const GameStates = require("../db/index.js").GameStates;
+const checkHands = require("../game/check.js");
 
 const bet = 1;
 
@@ -128,6 +129,27 @@ router.get('/allGames', (req, res, next) => {
     .catch(error => {
         res.status(500).send(error);
     });
+});
+
+router.get('/testCheckHands', (req, res, next) => {  
+    let uuid = "15d119e0-65eb-4383-af94-818e84fdf5e6"
+    GameStates.get(uuid)
+        .then((data) => {
+            // success;
+            
+            // update the gamestate 
+            
+            let winnerIndex = checkHands(data.community_cards, data.players);
+            // let winnerIndex = 'test';
+
+            console.log(winnerIndex)
+            res.status(200).json(JSON.stringify('The winner index: ' + winnerIndex));
+        })
+        .catch(error => {
+            // error;
+            console.error(error);
+            res.status(500).send('error: could not get game state');
+        });
 });
 
 router.post('/:username/createGame', (req, res, next) => { 
