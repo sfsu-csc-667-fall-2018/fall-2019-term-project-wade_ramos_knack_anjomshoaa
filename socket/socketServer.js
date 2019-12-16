@@ -1,7 +1,7 @@
 const socket = require('socket.io');
 const io = socket(); 
 
-//const chat = io.of('/chat')
+
 
   let users = [{
       socketId: '',
@@ -10,12 +10,11 @@ const io = socket();
 
  io.on('connection', socket => {
       console.log("Incoming Socket Request on: ", socket.id)
-      //console.log("Connected")
-      //adding a comment
+      console.log("Connected")
       const socketId = socket.id
 
     socket.on('join',room => {
-        //   console.log("Joined Room: " + room)
+          console.log("Joined Room: " + room)
           socket.join(room)
     })
 
@@ -25,7 +24,7 @@ const io = socket();
     })  
 
     socket.on('leaveRoom', ({path}) => {
-        // console.log('Left Room: ', path);
+        console.log('Left Room: ', path);
         socket.leave(path);
      })
 

@@ -132,14 +132,14 @@ router.get('/allGames', (req, res, next) => {
 });
 
 router.get('/testCheckHands', (req, res, next) => {  
-    let uuid = "15d119e0-65eb-4383-af94-818e84fdf5e6"
+    let uuid = "fd606c0c-bfa0-4e67-a0ae-32f73f6ec169"
     GameStates.get(uuid)
         .then((data) => {
             // success;
             
             // update the gamestate 
             
-            let winnerIndex = checkHands(data.community_cards, data.players);
+            let winnerIndex = checkHands.winner(data.community_cards, data.players);
             // let winnerIndex = 'test';
 
             console.log(winnerIndex)
