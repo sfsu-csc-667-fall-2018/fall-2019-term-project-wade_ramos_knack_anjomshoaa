@@ -184,6 +184,22 @@ class GameStates {
         });
     }
 
+    static updateDealer(uuid, dealer) {
+        return new Promise((resolve, reject) => {
+            connection.none('UPDATE gamestates SET dealer = $1, updated_at = NOW() WHERE id = $2;', [dealer, uuid])
+            .then(() => {
+                // success;
+                // console.log('updated players in db');
+               resolve('updated deck in db');
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                reject(error)
+            });
+        });
+    }
+
     static updateBettingRound(uuid, round) {
         return new Promise((resolve, reject) => {
             connection.none('UPDATE gamestates SET betting_round = $1, updated_at = NOW() WHERE id = $2;', [round, uuid])

@@ -7,47 +7,60 @@ const bet = 1;
 const io = require('../socket/socketServer');
 
 const updateCurPlayer = (players, current_player) => {
-    if(current_player === 8)  
-    {
-        current_player = 0;
-    }
-    else
-    {
-        current_player += 1;
-    }
 
-    while(true)
-    {
-        if(players[current_player].isInHand === true)
+    console.log('updating current player');
+    return new Promise((resolve, reject) => {
+
+        console.log('current player: ', current_player)
+        if(current_player === 8)  
         {
-            return current_player
+            current_player = 0;
         }
         else
         {
-            if(current_player === 8)  
+            current_player += 1;
+        }
+        console.log('current player: ', current_player)
+        while(true)
+        {
+            if(players[current_player].isInHand === true)
             {
-                current_player = 0;
+                resolve(current_player);
+                break;
             }
             else
             {
-                current_player += 1;
+                if(current_player === 8)  
+                {
+                    current_player = 0;
+                }
+                else
+                {
+                    current_player += 1;
+                }
             }
         }
-    }
+            
+    });
+
 }
 
 const dealCards = (gamestate) => {
     
     return new Promise((resolve, reject) => {
-        for(let i = 0; i < 5; i++)
+        
+        if(gamestate.community_cards.length !== 5)
         {
-            gamestate.community_cards.push(gamestate.deck.pop())
+            for(let i = 0; i < 5; i++)
+            {
+                gamestate.community_cards.push(gamestate.deck.pop())
+            }
         }
     
         gamestate.players.forEach(player => {
             if(player.username !== null && player.isInHand === true)
             {
-                if(player.holeCards.length <= 2)
+                if(player.holeCards.length === 0)
                 {
                 player.holeCards.push(gamestate.deck.pop());
                 player.holeCards.push(gamestate.deck.pop());
@@ -155,28 +168,40 @@ router.post('/:id/:username/check', (req, res, next) => {
             console.log(data.players[data.current_player]) 
     
             // update the gamestate 
-            if(data.current_player === data.last_raised)
-            {
-                // the current betting round is over. 
-                // increment betting round.
-                data.betting_round += 1;
-            }
-            data.current_player = updateCurPlayer(data.players,data.current_player)
-            // end update to gamestate
             
-            // update current player in db
-            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player) 
-            // update betting round in db
-            const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round) 
- 
-            Promise.all([updateCurrentPlayer, updateBettingRound]).then(values => { 
-                console.log(values);
-                emitUpdatedGameState(uuid);
-                res.status(200).send(values);
-            })
-            .catch(errors => {
-                console.log(error)
-            });     
+            updateCurPlayer(data.players,data.current_player).then(index => {
+                data.current_player = index;
+                
+                if(data.current_player === data.dealer)
+                {
+                    // the current betting round is over. 
+                    // increment betting round.
+                    data.betting_round += 1;
+                    data.last_raised = -1;
+                    if(data.betting_round >= 5)
+                    {
+                        console.log('round over')
+                    }
+
+                }
+
+                // update current player in db
+                const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player) 
+                // update betting round in db
+                const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round) 
+    
+                Promise.all([updateCurrentPlayer, updateBettingRound]).then(values => { 
+                    console.log(values);
+                    emitUpdatedGameState(uuid);
+                    res.status(200).send(values);
+                })
+                .catch(errors => {
+                    console.log(error)
+                });     
+
+                })
+                // end update to gamestate
+           
         })
         .catch(error => {
             // error;
@@ -204,34 +229,46 @@ router.post('/:id/:username/call', (req, res, next) => {
             data.players[data.current_player].currentBet += bet;
             data.players[data.current_player].chipCount -= bet;
             data.pot_amount += bet; 
-            if(data.current_player === data.last_raised)
-            {
-                // the current betting round is over. 
-                // increment betting round.
-                data.betting_round += 1;
-            }
-            data.current_player = updateCurPlayer(data.players,data.current_player)
-            // end update to gamestate
-            
-            // update the players array in db
-            const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
-            // update current player in db
-            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player)  
-            // update pot amount in db
-            const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount)
-            // update betting round in db
-            const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round) 
 
-            Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount, updateBettingRound]).then(values => { 
-                console.log(values);
-                emitUpdatedGameState(uuid);
-                res.status(200).send(values);
+           
+
+            updateCurPlayer(data.players,data.current_player).then(index => {
+                data.current_player = index;
+
+                if(data.current_player === data.last_raised)
+                {
+                    // the current betting round is over. 
+                    // increment betting round.
+                    data.betting_round += 1;
+                    data.last_raised = -1;
+                }
+
+                // update the players array in db
+                const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+                // update current player in db
+                const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player)  
+                // update pot amount in db
+                const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount)
+                // update betting round in db
+                const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round)
+                // update last raised in db
+                const updateLastRaised = GameStates.updateLastRaised(uuid, data.last_raised); 
+
+                Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount, updateBettingRound, updateLastRaised]).then(values => { 
+                    console.log(values);
+                    emitUpdatedGameState(uuid);
+                    res.status(200).send(values);
+                })
+                .catch(errors => {
+                    console.log(error)
+                });  
+
+
+            }).catch(err => {
+                console.log('error in bet: ', err);
             })
-            .catch(errors => {
-                console.log(error)
-            });  
+            // end update to gamestate
 
-            //GameSa request for the updated gamestate and emit
         })
         .catch(error => {
             // error;
@@ -260,27 +297,33 @@ router.post('/:id/:username/bet', (req, res, next) => {
             data.players[data.current_player].chipCount -= bet;
             data.pot_amount += bet; 
             data.last_raised = data.current_player;
-            data.current_player = updateCurPlayer(data.players,data.current_player)
-            // end update to gamestate
-            
-            // update the players array in db
-            const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
-            // update last raised in db
-            const updateLastRaised = GameStates.updateLastRaised(uuid, data.last_raised);
-            // update current player in db
-            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player)  
-            // update pot amount in db
-            const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount)
- 
-            Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount, updateLastRaised]).then(values => { 
-                console.log(values);
-                emitUpdatedGameState(uuid);
-                res.status(200).send(values);
-                
+            updateCurPlayer(data.players,data.current_player).then(index => {
+                data.current_player = index;
+                // update the players array in db
+                const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+                // update last raised in db
+                const updateLastRaised = GameStates.updateLastRaised(uuid, data.last_raised);
+                // update current player in db
+                const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player)  
+                // update pot amount in db
+                const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount)
+    
+                Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount, updateLastRaised]).then(values => { 
+                    console.log(values);
+                    emitUpdatedGameState(uuid);
+                    res.status(200).send(values);
+                    
+                })
+                .catch(errors => {
+                    console.log(error)
+                });   
+
+
+            }).catch(err => {
+                console.log('error in bet: ', err);
             })
-            .catch(errors => {
-                console.log(error)
-            });   
+            // end update to gamestate
+    
         })
         .catch(error => {
             // error;
@@ -309,28 +352,29 @@ router.post('/:id/:username/raise', (req, res, next) => {
             data.players[data.current_player].chipCount -= (bet*2);
             data.pot_amount += (bet*2); 
             data.last_raised = data.current_player;
-            data.current_player = updateCurPlayer(data.players,data.current_player);
-            // end update to gamestate
-            
-            // update the players array in db
-            const updatePlayers = GameStates.updatePlayers(uuid, data.players); 
-            // update last raised in db
-            const updateLastRaised = GameStates.updateLastRaised(uuid, data.last_raised);
-            // update current player in db
-            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player); 
-            // update pot amount in db
-            const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount);
- 
-            Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount, updateLastRaised]).then(values => { 
-                console.log(values);
-                emitUpdatedGameState(uuid);
-                res.status(200).send(values);
-            })
-            .catch(errors => {
-                console.log(error)
-            });  
+            updateCurPlayer(data.players,data.current_player).then(index => {
+                data.current_player = index;
+                // update the players array in db
+                const updatePlayers = GameStates.updatePlayers(uuid, data.players); 
+                // update last raised in db
+                const updateLastRaised = GameStates.updateLastRaised(uuid, data.last_raised);
+                // update current player in db
+                const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player); 
+                // update pot amount in db
+                const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount);
+    
+                Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount, updateLastRaised]).then(values => { 
+                    console.log(values);
+                    emitUpdatedGameState(uuid);
+                    res.status(200).send(values);
+                })
+                .catch(errors => {
+                    console.log(error)
+                });  
 
-            //GameSa request for the updated gamestate and emit
+                })
+                // end update to gamestate
+            
         })
         .catch(error => {
             // error;
@@ -349,7 +393,7 @@ router.post('/:id/:username/fold', (req, res, next) => {
         GameStates.get(uuid)
         .then((data) => {
             // success;
-            console.log(data.players[data.current_player]) 
+             
             let playersInHand = 0;
             let winnerIndex = 0;
             // update the gamestate
@@ -367,34 +411,39 @@ router.post('/:id/:username/fold', (req, res, next) => {
             if(playersInHand === 1)
             {
                 // Everyone folded the last player wins: winnerIndex is accurate
-                data.betting_round = 111;
+                data.betting_round = 5;
                 data.players[winnerIndex].chipCount += data.pot_amount;
                 data.pot_amount = 0; 
             }
-            data.current_player = updateCurPlayer(data.players,data.current_player)
+            updateCurPlayer(data.players,data.current_player).then(index => {
+                data.current_player = index;
+                 // update the players array in db
+                const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+                // update current player in db
+                const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player) 
+                // update betting round in db 
+                const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round) 
+    
+                Promise.all([updatePlayers, updateCurrentPlayer, updateBettingRound]).then(values => { 
+                    console.log(values);
+                    emitUpdatedGameState(uuid);
+                    res.status(200).send(values);
+                })
+                .catch(errors => {
+                    console.log(error)
+                });  
+                })
+                .catch(error => {
+                // error;
+                console.error(error);
+                res.status(500).send('error: could not get game state');
+                });
+
+            }).catch(err => {
+                console.log(err);
+            })
             // end update to gamestate
             
-            // update the players array in db
-            const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
-            // update current player in db
-            const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player) 
-            // update betting round in db 
-            const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round) 
- 
-            Promise.all([updatePlayers, updateCurrentPlayer, updateBettingRound]).then(values => { 
-                console.log(values);
-                emitUpdatedGameState(uuid);
-                res.status(200).send(values);
-            })
-            .catch(errors => {
-                console.log(error)
-            });  
-        })
-        .catch(error => {
-            // error;
-            console.error(error);
-            res.status(500).send('error: could not get game state');
-        });
 });
 
 router.post('/:id/:username/:index/join', (req, res, next) => {
@@ -534,12 +583,15 @@ router.post('/:id/:username/leave', (req, res, next) => {
                 data.players.forEach(player => {
                     player.holeCards = [];
                 })
+                data.betting_round = 0;
             }
             
             // update the players array in db
             const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
+             // update betting round in db
+             const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round)
     
-            Promise.all([updatePlayers]).then(values => { 
+            Promise.all([updatePlayers, updateBettingRound]).then(values => { 
                 console.log(values);
                 emitUpdatedGameState(uuid);
                 res.status(200).send(values);
@@ -554,6 +606,94 @@ router.post('/:id/:username/leave', (req, res, next) => {
             res.status(500).send('error: could not get game state');
         });
 });
+
+router.post('/:id/gameOver', (req, res, next) => {
+    // query the db and get the current gamestate
+        // update the players array:
+            // update the current players current bet
+            // update the current players chip count
+        // update the current pot amount
+        // update the current player index
+        // deal new cards
+        // make anyone who is not inhand = true
+        // let gamestate = req.body;
+        let uuid = req.params.id
+            // query the db and get the current gamestate
+            GameStates.get(uuid)
+            .then((data) => {
+                // success;
+        
+                // update the gamestate
+
+                //update the players array
+                if(true)
+                {
+                data.players.forEach(player => {
+                    player.currentBet = 0;
+                    player.holeCards = [];
+                    if(player.username != null)
+                    {
+                        player.isInHand = true;
+                    }
+                })
+                }
+                data.pot_amount = 0; 
+                data.last_raised = -1;
+
+                updateCurPlayer(data.players,data.current_player).then(index => {
+                    data.current_player = index;
+                    data.dealer = index;
+                    data.community_cards = [];
+
+                    if(true)
+                    {
+                        // note that dealCards also updated the betting_round
+                        dealCards(data).then(updatedGameState => {
+                            data = updatedGameState
+                        }).catch(err => {
+                            console.log(err)
+                        })
+                    }
+                    
+                    // update the players array in db
+                    const updatePlayers = GameStates.updatePlayers(uuid, data.players); 
+                    // update last raised in db
+                    const updateLastRaised = GameStates.updateLastRaised(uuid, data.last_raised);
+                    // update current player in db
+                    const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player);  
+                    // update pot amount in db
+                    const updatePotAmount = GameStates.updatePotAmount(uuid,data.pot_amount);
+                    // update deck in db
+                    const updateDeck = GameStates.updateDeck(uuid, data.deck);
+                    // update community cards in db
+                    const updateCommunityCards = GameStates.updateCommunityCards(uuid,data.community_cards);
+                    // update betting round in db
+                    const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round);
+                    // update dealer in db
+                    const updateDealer = GameStates.updateDealer(uuid, data.dealer);
+        
+                    Promise.all([updatePlayers, updateCurrentPlayer, updatePotAmount, updateLastRaised, updateDeck, updateCommunityCards, updateBettingRound, updateDealer]).then(values => { 
+                        console.log(values);
+                        emitUpdatedGameState(uuid);
+                        res.status(200).send(values);
+                        
+                    })
+                    .catch(errors => {
+                        console.log(error)
+                    });   
+    
+    
+                }).catch(err => {
+                    console.log('error in bet: ', err);
+                })
+                // end update to gamestate
+            })
+            .catch(error => {
+                // error;
+                console.error(error);
+                res.status(500).send('error: could not get game state');
+            });
+    });
 
 router.get('/:id', function(request, response, next) {
     response.status(200).sendFile(__basedir + '/build/index.html');

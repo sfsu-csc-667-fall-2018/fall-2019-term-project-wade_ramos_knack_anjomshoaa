@@ -29,6 +29,8 @@ class State {
                 _deck.push(card);
             });
         });
+
+        console.log(_deck.length);
         
         shuffleArray(_deck).then((shuffledDeck) => {
             _deck = shuffledDeck;
@@ -37,6 +39,14 @@ class State {
             console.log(err);
         })
         
+
+        shuffleArray(_deck).then((shuffledDeck) => {
+          _deck = shuffledDeck;
+      })
+      .catch((err) => {
+          console.log(err);
+      })
+      
         // console.log(_deck)
         
         let players = [
@@ -122,8 +132,8 @@ class State {
                     , player_ranking: null
                     , is_active: true
                     , dealer: 0
-                    , last_raised: 0
-                    , current_player: 3
+                    , last_raised: -1
+                    , current_player: 0
                     , players: players
                     , betting_round: 0
                 }
