@@ -1,7 +1,6 @@
 ﻿# fall-2019-term-project-wade_ramos_knack_anjomshoaa
  
- 
-#front end repo
+ ## frontend repo
 https://github.com/jknack0/termproject
 
 ## Getting Started
