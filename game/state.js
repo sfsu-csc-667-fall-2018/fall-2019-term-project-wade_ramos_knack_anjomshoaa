@@ -6,7 +6,7 @@ const defaultCurrentBet = 0;
 
 let _deck = [];
 let suits = ["C","W","S","P"];
-let ranks = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
+let ranks = ["2","3","4","5","6","7","8","9","T","J","Q","K","A"];
 
 shuffleArray = (array) => {
     return new Promise((resolve, reject) => {
