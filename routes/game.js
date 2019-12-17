@@ -131,19 +131,29 @@ router.get('/allGames', (req, res, next) => {
     });
 });
 
-router.get('/testCheckHands', (req, res, next) => {  
-    let uuid = "15d119e0-65eb-4383-af94-818e84fdf5e6"
+router.get('/testCheckHands/:id', (req, res, next) => {  
+    let uuid = req.params.id;
     GameStates.get(uuid)
         .then((data) => {
             // success;
             
             // update the gamestate 
             
-            let winnerIndex = checkHands.winner(data.community_cards, data.players);
+            // let winnerIndex = checkHands.winner(data.community_cards, data.players);
             // let winnerIndex = 'test';
+            
+            checkHands.winner(data.community_cards, data.players).then(index =>{ 
+                let winnerIndex = index;
+                data.players[winnerIndex].chipCount += data.pot_amount;
 
-            console.log(winnerIndex)
-            res.status(200).json(JSON.stringify('The winner index: ' + winnerIndex));
+                console.log(winnerIndex)
+                console.log('pot: ', data.pot_amount)
+                console.log(data.players[winnerIndex].chipCount)
+                res.status(200).json(JSON.stringify('The winner index: ' + winnerIndex));
+            });
+
+            //res.status(200).json(JSON.stringify('end of testcheck'));
+           
         })
         .catch(error => {
             // error;
@@ -191,7 +201,7 @@ router.post('/:id/:username/check', (req, res, next) => {
     
             // update the gamestate 
             
-            updateCurPlayer(data.players,data.current_player).then(index => {
+            updateCurPlayer(data.players,data.current_player).then(async index => {
                 data.current_player = index;
                 
                 if(data.current_player === data.dealer)
@@ -202,18 +212,38 @@ router.post('/:id/:username/check', (req, res, next) => {
                     data.last_raised = -1;
                     if(data.betting_round >= 5)
                     {
-                        console.log('round over')
-                        let winnerIndex = checkHands.winner(data.community_cards, data.players);
+                        let winnerIndex = await checkHands.winner(data.community_cards, data.players)
                         data.players[winnerIndex].chipCount += data.pot_amount;
+                            console.log('round over \nWinner: ',data.players[winnerIndex]);
+                            console.log('Winnings: ', data.players[winnerIndex].chipCount);
+                        // checkHands.winner(data.community_cards, data.players).then(index =>{ 
+                        //     console.log('round over')
+                        //     let winnerIndex = index;
+                        //     data.players[winnerIndex].chipCount += data.pot_amount;
+
+                        //     console.log('round over \nWinner: ',data.players[winnerIndex]);
+                        //     console.log('Winnings: ', data.players[winnerIndex].chipCount);
+                        // });     
                     }
                 }
+
+                if(data.current_player === data.last_raised)
+                {
+                    // the current betting round is over. 
+                    // increment betting round.
+                    data.betting_round += 1;
+                    data.last_raised = -1;
+                }
+
 
                 // update current player in db
                 const updateCurrentPlayer = GameStates.updateCurrentPlayer(uuid,data.current_player) 
                 // update betting round in db
                 const updateBettingRound = GameStates.updateBettingRound(uuid,data.betting_round) 
+                // update the players array in db
+                const updatePlayers = GameStates.updatePlayers(uuid, data.players) 
     
-                Promise.all([updateCurrentPlayer, updateBettingRound]).then(values => { 
+                Promise.all([updateCurrentPlayer, updateBettingRound, updatePlayers]).then(values => { 
                     console.log(values);
                     emitUpdatedGameState(uuid);
                     res.status(200).send(values);
@@ -253,10 +283,10 @@ router.post('/:id/:username/call', (req, res, next) => {
             data.players[data.current_player].chipCount -= bet;
             data.pot_amount += bet; 
 
-            updateCurPlayer(data.players,data.current_player).then(index => {
+            updateCurPlayer(data.players,data.current_player).then(async index => {
                 data.current_player = index;
 
-                if(data.current_player === data.last_raised)
+                if(data.current_player === data.dealer)
                 {
                     // the current betting round is over. 
                     // increment betting round.
@@ -264,11 +294,11 @@ router.post('/:id/:username/call', (req, res, next) => {
                     data.last_raised = -1;
 
                     if(data.betting_round >= 5)
-                    {
-                        let winnerIndex = checkHands.winner(data.community_cards, data.players);
+                    {   
+                        let winnerIndex = await checkHands.winner(data.community_cards, data.players)
                         data.players[winnerIndex].chipCount += data.pot_amount;
-                        console.log('round over \nWinner: ',data.players[winnerIndex]);
-                        console.log('Winnings: ', data.players[winnerIndex].chipCount);
+                            console.log('round over \nWinner: ',data.players[winnerIndex]);
+                            console.log('Winnings: ', data.players[winnerIndex].chipCount);
                     }
                 }
 
