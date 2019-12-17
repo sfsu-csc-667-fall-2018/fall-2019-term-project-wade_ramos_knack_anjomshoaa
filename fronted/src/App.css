@@ -1,0 +1,455 @@
+* {
+  margin:0;
+  padding:0;
+  border:0;
+}
+
+#root {
+text-align: center;
+background: rgb(34, 107, 60);
+width: 100vw;
+height: 100vh;
+}
+
+#main-logo {
+max-width: 70vw;
+z-index: -1;
+}
+
+#login {
+position: absolute;
+bottom: 8%;
+left: 20%;
+}
+
+#register {
+position: absolute;
+bottom: 8%;
+right: 18%;
+}
+
+.landing-button {
+width: 160px;
+height: 60px;
+font-size: 25px;
+background:rgb(185, 185, 185);
+border: 3px solid white;
+border-radius: 3px;
+cursor: pointer;
+}
+
+.landing-button:hover {
+border-color: black;
+}
+
+#login-logo {
+width: 40vw;
+}
+
+a {
+text-decoration: none;
+}
+
+.user-input input {
+margin-bottom: 4%;
+padding: 15px;
+background-color: rgb(184, 184, 184);
+border: solid white 3px;
+color: black;
+font-size: 20px;
+border-radius: 3px;
+}
+
+.user-input input[type=submit] {
+width: 50%;
+cursor: pointer;
+}
+input[type=submit]:hover {
+border-color: black;
+width: 50%;
+}
+
+form {
+margin: 0 35%;
+text-align: center;
+}
+
+#register-logo {
+width: 30vw;
+}
+
+.player{
+width: 105px;
+height: 80px;
+padding: 0px;
+margin-top: 0px;
+}
+
+.play-text-info{
+margin: auto;
+border-width: 1px;
+text-align: center;
+width: 140px;
+height: 40px;
+padding-left: 10px;
+border-style: solid;
+border-radius: 15px;
+border-color: white;
+font-family: Arial, Helvetica, sans-serif;
+padding: 1px; 
+background-color: black;
+color: white;
+float:left;
+position: absolute;
+top: 80px;
+opacity: .8;
+}
+
+.not-in-hand {
+opacity: .5 !important;
+}
+
+#hole-card{
+padding:0px;
+margin:0px;
+width: 70px;
+z-index: -1;
+}
+
+#card{
+  width: 140px;
+}
+
+#community-cards{
+position: absolute;
+top: 30%;
+left: 40%;
+}
+
+#table{
+background-color: green;
+width: 100vw;
+height: 80vh;
+border-radius: 40%;
+}
+
+.join-button{
+margin-top: 20px;
+font-size: 18px;
+background-color: grey;
+border: none;
+padding: 15px 10px;
+border-radius: 10px;
+margin-top: 40px;
+cursor: pointer;
+}
+
+.join-button:hover{
+border: 1px black solid;
+}
+
+#player0{
+position: absolute;
+left: 74%;
+}
+
+#player1{
+position: absolute;
+left: 88%;
+top: 15%;
+}
+
+#player2{
+position: absolute;
+left: 88%;
+top: 50%;
+}
+
+#player3{
+position: absolute;
+left: 70%;
+top: 61%;
+}
+
+#player4{
+position: absolute;
+left: 46%;
+top: 61%;
+}
+
+#player5{
+position: absolute;
+left: 24%;
+top: 61%;
+}
+
+#player6{
+position: absolute;
+left: 2%;
+top: 50%;
+}
+
+#player7{
+position: absolute;
+left: 1%;
+top: 15%;
+} 
+
+#player8{
+position: absolute;
+left: 17%;
+}
+
+/* .Grids{
+border-left: 6px solid white;
+height: 100vh;
+} */
+
+.userInfo{
+position: relative;
+display: block;
+float:left;
+border-right: 3px solid white;
+height: 100vh;
+width: 40vh;
+
+}
+
+.lobby-username{
+position: relative;
+top: 34px;
+left: 50px;
+color: white;
+font-family: Arial;
+
+}
+.winnings{
+position: relative;
+top: 40px;
+left: 50px;
+color: white;
+font-size: 19px;
+font-family: Arial;
+}
+
+.barks-box{
+position: relative;
+right: 90px;
+top: 505px;
+width: 210px;
+height: 10px;
+font-size: 18px;
+font-weight: bold;
+background:rgb(185, 185, 185);
+border: 3px solid white;
+border-radius: 3px;
+
+}
+.enter-game-button{
+position: relative;
+margin-left: 20%;
+top: 35px;
+left: 350px;
+height: 130px;
+font-size: 20px;
+font-weight: bold;
+text-align: center;
+display:table-cell;
+vertical-align:middle;
+background:rgb(245, 224, 53);
+border: 3px solid white;
+border-radius: 3px;
+}
+
+.barks-send-button{
+position: relative;
+margin-left: 20%;
+top: 455px;
+left: 112px;
+height: 46px;
+font-size: 14px;
+font-weight: bold;
+background:rgb(245, 224, 53);
+border: 3px solid white;
+border-radius: 3px;
+}
+
+.chat{
+border-top: 3px solid white;
+position: absolute;
+float:left;
+height: 70vh;
+width: 40vh;
+top: 30vh
+}
+
+.games{
+/* float: right; */
+position:absolute;
+/* border-left: 1px solid black; */
+height: 100vh;
+width: 70vh;
+left: 30vh;
+
+}
+
+.log-out{
+position: relative;
+bottom: 42px;
+right: 0.5px;
+width: 250px;
+height: 30px;
+font-size: 18px;
+font-weight: bold;
+background:rgb(185, 185, 185);
+border: 3px solid white;
+border-radius: 3px;
+}
+
+.settings{
+position: relative;
+bottom: 34px;
+width: 250px;
+height: 30px;
+font-size: 18px;
+font-weight: bold;
+background:rgb(185, 185, 185);
+border: 3px solid white;
+border-radius: 3px;
+}
+.create-game{
+position: relative;
+bottom: 27px;
+width: 250px;
+height: 30px;
+font-size: 18px;
+font-weight: bold;
+background:rgb(185, 185, 185);
+border: 3px solid white;
+border-radius: 3px;
+}
+
+.user-input {
+position: relative;
+text-align: center;
+}
+
+.game-tiles{
+position: relative;
+left: 200px;
+top: 40px;
+border-radius: 3px;
+border: 3px solid white;
+padding: 20px;
+width: 920px;
+height: 200px;
+}
+
+#profile-logo {
+position: relative;
+bottom: 35px;
+right: 70px;
+width: 10vw;
+}
+
+.player-turn-menu {
+display: flex;
+justify-content: space-evenly;
+width: 50vw;
+height: 20vh;
+background-color: rgb(49, 71, 46);
+position: fixed;
+bottom: 0;
+right: 0;
+border-radius: 5px;
+}
+
+.player-turn-menu button {
+padding: 7% 11%;
+margin: 2% 1%;
+font-size: 25px;
+background-color: rgb(97, 131, 97);
+color: white;
+border-radius: 3px;
+cursor: pointer;
+}
+
+.player-turn-menu button:hover {
+background-color: rgb(160, 199, 160);
+}
+
+#leave-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin-top: 15px;
+  margin-left: 1%;
+  padding: 2% 2%;
+  border-radius: 3px;
+  cursor: pointer;
+  background-color: rgb(97, 131, 97);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+#leave-button:hover {
+  background-color: rgb(160, 199, 160);
+}
+
+.gameslobby-container {
+  height: 100;
+  width: 100vw;
+}
+
+#gameslobby-user-menu{
+  position: absolute;
+  height: 30vh;
+  width: 30vw;
+}
+
+.gameslobby-games-tiles button{ 
+  left: 28%;
+  margin-top: 10px;
+  margin: 3px;
+  width: 160px;
+  height: 60px;
+  font-size: 25px;
+  background:rgb(185, 185, 185);
+  border: 3px solid white;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.gameslobby-games-tiles button:hover {
+  border-color: black;
+}
+
+.chat-container {
+  position: absolute;
+  top: 30vh;
+  width: 30vw;
+  height: 70vh;
+}
+
+.gameslobby-games-tiles {
+  padding: 1%;
+  position: absolute;
+  left: 30vw;
+  width: 60vw;
+} 
+
+.gameslobby-games-tiles h2{
+  font-weight: 600;
+  font-size: 30px;
+  margin-bottom: 10px;
+} 
+
+.game-tile {
+  padding-bottom: 10px;
+  font-size: 20px;
+}
+  
+
+
+

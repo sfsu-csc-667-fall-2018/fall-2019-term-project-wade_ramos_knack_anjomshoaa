@@ -1,0 +1,19 @@
+.msgWrapper {
+    flex-direction: row;
+    display: flex;
+    background: white;
+    border-radius: 6px;
+    padding: 3px;
+    width: 98%;
+    margin: 2px;
+}
+
+#name {
+    color: red;
+}
+
+#text {
+    text-align: left;
+    /* border: solid black 1px; */
+    padding-left: 3px;
+}
